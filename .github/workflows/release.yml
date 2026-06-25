@@ -141,6 +141,7 @@ jobs:
 
       - name: notarize macOS SEA binary
         if: runner.os == 'macOS' && (startsWith(github.ref, 'refs/tags/') || github.event.inputs.notarize_macos == 'true')
+        timeout-minutes: 20
         shell: bash
         env:
           APPLE_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
@@ -157,12 +158,26 @@ jobs:
           : "${APPLE_APP_PASSWORD:?APPLE_APP_PASSWORD secret is required}"
 
           zip="$RUNNER_TEMP/${{ matrix.asset }}.zip"
+          notary_json="$RUNNER_TEMP/${{ matrix.asset }}-notarytool.json"
           ditto -c -k --keepParent "${{ matrix.out }}" "$zip"
+
+          set +e
           xcrun notarytool submit "$zip" \
             --apple-id "$APPLE_ID" \
             --team-id "$APPLE_TEAM_ID" \
             --password "$APPLE_APP_PASSWORD" \
-            --wait
+            --wait \
+            --timeout 15m \
+            --output-format json > "$notary_json"
+          notary_status=$?
+          set -e
+
+          cat "$notary_json"
+          if [[ "$notary_status" -ne 0 ]]; then
+            echo "Apple notarization failed or did not finish within 15 minutes." >&2
+            exit "$notary_status"
+          fi
+
           xcrun stapler staple -v "${{ matrix.out }}" || echo "Stapling skipped; bare CLI executables may rely on online notarization lookup."
 
       - name: stage asset
