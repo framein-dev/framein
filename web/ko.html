@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Framein - Claude, Codex, Gemini를 오가도 하나의 작업 프레임</title>
+<meta name="description" content="Framein은 Claude, Codex, Gemini 사이에서 작업 계약, 결정 기록, 챌린지, 모델 전환 캡슐, 검증 상태를 로컬로 공유하는 AI 코딩 작업 프레임입니다.">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+<meta name="author" content="Frameout">
+<meta name="application-name" content="Framein">
+<meta name="theme-color" content="#f6f6f1">
+<link rel="icon" href="/assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="canonical" href="https://www.framein.dev/ko">
+<link rel="alternate" hreflang="en" href="https://www.framein.dev/">
+<link rel="alternate" hreflang="ko" href="https://www.framein.dev/ko">
+<link rel="alternate" hreflang="x-default" href="https://www.framein.dev/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Framein - Claude, Codex, Gemini를 오가도 하나의 작업 프레임">
+<meta property="og:description" content="한 모델로 시작하고, 다른 모델의 시선을 불러오고, 필요하면 전환하고, 마지막은 검증으로 닫습니다.">
+<meta property="og:url" content="https://www.framein.dev/ko">
+<meta property="og:site_name" content="Framein">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:image" content="https://www.framein.dev/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Framein 작업 프레임 미리보기">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Framein - Claude, Codex, Gemini를 오가도 하나의 작업 프레임">
+<meta name="twitter:description" content="한 모델로 시작하고, 다른 모델의 시선을 불러오고, 필요하면 전환하고, 마지막은 검증으로 닫습니다.">
+<meta name="twitter:image" content="https://www.framein.dev/assets/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://frameout.co.kr/#organization",
+      "name": "Frameout",
+      "url": "https://frameout.co.kr/",
+      "email": "axc@frameout.co.kr"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.framein.dev/#website",
+      "name": "Framein",
+      "url": "https://www.framein.dev/",
+      "inLanguage": ["en", "ko"],
+      "publisher": { "@id": "https://frameout.co.kr/#organization" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.framein.dev/#software",
+      "name": "Framein",
+      "alternateName": "framein",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Windows, macOS, Linux",
+      "softwareVersion": "0.0.4",
+      "url": "https://www.framein.dev/",
+      "image": "https://www.framein.dev/assets/og-image.png",
+      "codeRepository": "https://github.com/framein-dev/framein",
+      "license": "https://opensource.org/license/mit",
+      "programmingLanguage": "TypeScript",
+      "description": "Framein은 Claude, Codex, Gemini 사이에서 하나의 로컬 작업 프레임을 유지하는 AI 코딩 도구입니다.",
+      "publisher": { "@id": "https://frameout.co.kr/#organization" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.framein.dev/ko#webpage",
+      "url": "https://www.framein.dev/ko",
+      "name": "Framein - Claude, Codex, Gemini를 오가도 하나의 작업 프레임",
+      "description": "Framein은 Claude, Codex, Gemini 사이에서 작업 계약, 결정 기록, 챌린지, 모델 전환 캡슐, 검증 상태를 로컬로 공유하는 AI 코딩 작업 프레임입니다.",
+      "inLanguage": "ko",
+      "isPartOf": { "@id": "https://www.framein.dev/#website" },
+      "about": { "@id": "https://www.framein.dev/#software" }
+    }
+  ]
+}
+</script>
+<style>
+  :root{--bg:#f6f6f1;--panel:#fff;--ink:#202124;--muted:#5f6268;--soft:#e7e7df;--line:#d7d7cf;--brand:#476900;--brand2:#0f6b55;--code:#0d0f11;--codeText:#ecefe7;--dim:#9aa09a;--ok:#7bd88f;--fail:#ff9b9b;--accent:#d7ff5f}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.68;word-break:keep-all;-webkit-font-smoothing:antialiased}
+  a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:20;background:rgba(246,246,241,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+  .nav{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .brand{display:inline-flex;align-items:center;color:var(--ink);text-decoration:none}.brand:hover{text-decoration:none}.brand-logo{display:block;width:118px;height:auto}
+  nav{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:flex-end}nav a{font-size:14px;color:var(--muted)}nav a.primary{color:var(--brand);font-weight:750}
+  section{padding:68px 0;border-top:1px solid var(--line)}section.hero{border-top:0;padding:70px 0 64px}
+  .hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:38px;align-items:center}
+  .eyebrow{color:var(--brand);font-size:12px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+  h1{font-size:clamp(36px,5.1vw,58px);line-height:1.05;margin:0 0 22px;letter-spacing:0;max-width:16ch;text-wrap:balance}
+  h2{font-size:clamp(28px,3.7vw,40px);line-height:1.18;margin:0 0 18px;max-width:24ch;text-wrap:balance}
+  h3{font-size:18px;margin:0 0 8px}
+  p{margin:0 0 16px;text-wrap:pretty}.lead{font-size:20px;color:#37393d;max-width:56ch;text-wrap:pretty}.muted{color:var(--muted)}.small{font-size:14px}.tight{max-width:68ch}.hero-title-ko{max-width:16ch}.headline-lines span{display:block}.hero h1.headline-lines span{white-space:nowrap}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border-radius:8px;background:var(--brand);color:#fff;font-weight:780;font-size:14px;border:1px solid var(--brand)}.btn:hover{text-decoration:none;filter:brightness(.96)}.btn.secondary{background:transparent;color:var(--brand)}
+  code,pre,.mono{font-family:"Geist Mono","JetBrains Mono","Cascadia Mono",Consolas,monospace}
+  code{font-size:.9em;background:var(--soft);border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+  pre{margin:0;background:var(--code);color:var(--codeText);border-radius:8px;border:1px solid #1d2224;padding:18px;overflow:auto;font-size:13px;line-height:1.58;box-shadow:0 18px 50px rgba(15,15,16,.16)}
+  pre code{background:none;border:0;padding:0;color:inherit}.dim{color:var(--dim)}.ok{color:var(--ok)}.fail{color:var(--fail)}.accent{color:var(--accent)}.warn{color:#ffd27a}
+  .status-strip{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}.pill{border:1px solid var(--line);background:rgba(255,255,255,.68);border-radius:999px;padding:7px 10px;font-size:13px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid.two{grid-template-columns:repeat(2,1fr)}.grid.four{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px}.card strong{display:block;margin-bottom:5px}
+  .number{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#e4efd2;color:#2d5200;font-weight:850;margin-bottom:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;background:var(--panel);border-radius:8px;overflow:hidden}th,td{border:1px solid var(--line);padding:12px 13px;text-align:left;vertical-align:top}th{background:var(--soft)}
+  .compare-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.compare-item{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.compare-item strong{display:block;margin-bottom:6px}.compare-item p{margin:0}
+  .split{display:grid;grid-template-columns:.78fr 1.22fr;gap:34px;align-items:start}.callout{border-left:4px solid var(--brand2);padding:12px 0 12px 16px;color:#34373a;background:linear-gradient(90deg,rgba(15,107,85,.08),transparent)}
+  footer{border-top:1px solid var(--line);padding:30px 0 54px;color:var(--muted);font-size:13px}.footer-inner{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}.footer-brand{display:inline-flex;align-items:flex-end;gap:8px;color:var(--ink);text-decoration:none}.footer-brand:hover{text-decoration:none}.footer-logo{display:block;width:88px;height:auto}.footer-brand span{color:var(--muted);font-weight:500;font-size:11px;line-height:1;margin-bottom:7px}.footer-sep{color:var(--line)}
+  @media(max-width:880px){.split{grid-template-columns:1fr}.grid,.grid.two,.grid.four{grid-template-columns:1fr}.nav{align-items:flex-start;padding:14px 24px}.brand-logo{width:106px}nav{justify-content:flex-start}}
+  @media(max-width:760px){.hero-grid{grid-template-columns:1fr}}
+  @media(max-width:640px){.wrap{padding:0 18px}.nav{min-height:64px;align-items:center;padding:18px 24px 14px;gap:14px}.brand-logo{width:98px}nav{gap:14px}section{padding:50px 0}section.hero{padding:48px 0 46px}.hero-grid{gap:28px}.eyebrow{font-size:11px;margin-bottom:12px}h1{font-size:clamp(32px,8.8vw,36px);line-height:1.08;max-width:100%}h2{font-size:29px;line-height:1.18;max-width:100%}.hero-title-ko{max-width:100%}.lead{font-size:18px;line-height:1.58}.actions{gap:10px;margin-top:22px}.btn{flex:1 1 180px;min-height:44px}.status-strip{gap:8px;margin-top:18px}.pill{font-size:12px;padding:6px 9px}.card,.compare-item{padding:16px}.compare-list{grid-template-columns:1fr}pre{font-size:11.5px;line-height:1.54;padding:14px;box-shadow:0 14px 34px rgba(15,15,16,.14)}pre,pre code{white-space:pre-wrap;overflow-wrap:anywhere}table{font-size:13px}th,td{padding:10px}.footer-inner{gap:8px}.footer-logo{width:76px}.footer-brand span{font-size:10px;margin-bottom:6px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/ko" aria-label="framein 홈"><img class="brand-logo" src="/assets/framein-bi.png" alt="framein"></a>
+    <nav aria-label="주요 메뉴">
+      <a class="primary" href="https://github.com/framein-dev/framein">GitHub</a>
+      <a href="/">EN</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">AI 코딩 에이전트를 위한 로컬 작업 프레임</div>
+        <h1 class="hero-title-ko headline-lines"><span>Claude, Codex,</span><span>Gemini를 오가도</span><span>작업 기준은 하나로.</span></h1>
+        <p class="lead">한 모델로 시작하고, 막히면 다른 모델의 시선을 불러오고, 필요할 땐 같은 작업 상태 위에서 리드 모델을 바꿉니다. 마지막은 검증으로 닫습니다.</p>
+        <div class="actions">
+          <a class="btn" href="#start">작업 루프 보기</a>
+          <a class="btn secondary" href="https://github.com/framein-dev/framein">README 보기</a>
+          <a class="btn secondary" href="https://github.com/framein-dev/framein/blob/main/docs/MANUAL.md">명령어 매뉴얼</a>
+        </div>
+        <div class="status-strip" aria-label="프로젝트 상태">
+          <span class="pill">pre-release v0.0.4</span>
+          <span class="pill">243 tests</span>
+          <span class="pill">런타임 의존성 0</span>
+          <span class="pill">Node 22.5+</span>
+        </div>
+      </div>
+      <pre aria-label="Framein 터미널 예시"><code><span class="dim"># 이미 쓰는 에이전트에서 시작합니다.</span>
+<span class="accent">$ framein start "Google OAuth 추가"</span>
+contract <span class="ok">set</span>: email login 보존
+lead claude
+
+<span class="dim"># 다른 모델에게 범위를 좁혀 검토를 맡깁니다.</span>
+<span class="accent">$ framein challenge "OAuth callback state in session" --run</span>
+reviewer codex
+verdict <span class="warn">change required</span>
+required nonce/state 검증 추가
+
+<span class="dim"># 필요하면 리드 모델을 바꾸고, 검증으로 닫습니다.</span>
+<span class="accent">$ framein capsule gemini</span>
+next lead facts:
+contract · diff · tests · decisions
+
+<span class="accent">$ framein ship</span>
+build <span class="ok">ok</span> · tests <span class="ok">42/42</span>
+risk <span class="warn">high: auth/ touched</span>
+=> READY WITH HUMAN GATE</code></pre>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">왜 필요한가</div>
+        <h2 class="headline-lines"><span>좋은 프롬프트만으로는</span><span>작업이 계속 이어지지 않습니다.</span></h2>
+      </div>
+      <div class="tight">
+        <p>PRD, Plan, ADR, 스킬팩이 잘 갖춰지면 어떤 모델이든 더 잘 일합니다. 문제는 리드 모델이 막히거나, 다른 모델의 외부 시선이 필요하거나, 쿼터와 모델 적합성 때문에 전환하고 싶을 때 시작됩니다.</p>
+        <p class="callout"><strong>Framein은 새 IDE나 자동 에이전트 팀이 아닙니다.</strong> 이미 쓰는 Claude, Codex, Gemini 아래에 하나의 로컬 작업 프레임을 둡니다.</p>
+      </div>
+    </div>
+    <div class="wrap grid four" style="margin-top:26px">
+      <div class="card"><strong>막힌 리드 모델</strong><span class="muted small">한 모델이 같은 계획이나 실패 모드만 반복합니다.</span></div>
+      <div class="card"><strong>단일 모델의 사각지대</strong><span class="muted small">설계, 보안, 테스트 관점에서 다른 모델의 검토가 필요합니다.</span></div>
+      <div class="card"><strong>전환할 때 리셋</strong><span class="muted small">모델을 바꿀 때마다 의도, 위험, 결정을 다시 설명해야 합니다.</span></div>
+      <div class="card"><strong>검증 없는 마무리</strong><span class="muted small">마지막 답변은 여전히 빌드, 테스트, 위험 게이트를 통과해야 합니다.</span></div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap">
+      <div class="eyebrow">작업 루프</div>
+      <h2 class="headline-lines"><span>시작하고, 챌린지하고,</span><span>전환하고, 검증합니다.</span></h2>
+      <div class="grid four">
+        <div class="card"><span class="number">1</span><h3>시작</h3><p class="muted small"><code>framein start</code>가 구현이 흔들리기 전에 요청을 공유 작업 계약으로 고정합니다.</p></div>
+        <div class="card"><span class="number">2</span><h3>챌린지</h3><p class="muted small"><code>framein challenge</code>가 다른 리뷰어 역할에게 제한된 반론을 요청합니다.</p></div>
+        <div class="card"><span class="number">3</span><h3>전환</h3><p class="muted small"><code>framein capsule</code>이 계약, diff, 검증 결과, ADR, ledger에서 다음 리드가 읽을 사실을 준비합니다.</p></div>
+        <div class="card"><span class="number">4</span><h3>검증</h3><p class="muted small"><code>framein verify</code>와 <code>ship</code>이 빌드/테스트와 위험 게이트로 작업을 닫습니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">익숙한 사용감</div>
+        <h2 class="headline-lines"><span>스킬처럼 부르고,</span><span>상태는 프로젝트에 남깁니다.</span></h2>
+      </div>
+      <div>
+        <div class="compare-list">
+          <div class="compare-item"><strong>Claude와 Gemini slash command</strong><p class="muted small"><code>/fr:*</code>가 에이전트 세션 안에서 같은 로컬 엔진을 호출합니다.</p></div>
+          <div class="compare-item"><strong>Codex project skill</strong><p class="muted small"><code>$fr-*</code>가 deprecated prompt 파일 없이 같은 동사를 제공합니다.</p></div>
+          <div class="compare-item"><strong>기존 스킬팩과 페르소나</strong><p class="muted small">프롬프트 프레임워크는 그대로 두고, 계약·원장·게이트만 공유합니다.</p></div>
+          <div class="compare-item"><strong>터미널, CI, MCP 클라이언트</strong><p class="muted small">CLI, JSON 출력, wrapper, MCP 서버가 같은 로컬 작업 프레임을 읽고 씁니다.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">실제 저장소에서 시작</div>
+        <h2 class="headline-lines"><span>설치해 두면, 모델을 오가도</span><span>같은 작업 프레임을 씁니다.</span></h2>
+        <p class="muted">공개 npm 릴리스 전까지는 GitHub Release 설치 스크립트를 사용합니다. 아래는 수동으로 확인하는 가장 작은 흐름입니다. 실제 사용에서는 에이전트가 <code>/fr:*</code> 또는 <code>$fr-*</code>로 같은 작업 프레임 동사를 호출할 수 있습니다.</p>
+      </div>
+      <pre><code>curl -fsSL https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.sh | sh
+framein --version
+
+cd your-project
+framein init
+framein integrations install all --write
+
+framein start "가장 작은 안전한 변경 완료하기"
+
+# 다른 모델의 검토나 전환이 필요할 때
+framein challenge "구현 전 계획 검토" --run
+framein capsule codex
+
+framein verify
+framein ship</code></pre>
+    </div>
+  </section>
+
+  <section id="trust">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">신뢰 경계</div>
+        <h2 class="headline-lines"><span>로컬 우선.</span><span>자격증명 중계 없음.</span></h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>로컬 작업 프레임</h3>
+          <p class="muted small">작업 계약, ADR, 메모리, 원장, 검증 결과, 락은 저장소 안에 남습니다. SQLite store는 캐시이고 JSON snapshot은 git 친화 원천입니다.</p>
+        </div>
+        <div class="card">
+          <h3>프록시가 아닙니다</h3>
+          <p class="muted small">Framein은 제공자 자격증명을 수집하지 않고, 구독을 공유하지 않고, MCP 도구를 릴레이하지 않고, 터미널 입출력 장치(TTY)를 화면 스크래핑 방식으로 읽지 않습니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="wrap footer-inner"><a class="footer-brand" href="/ko" aria-label="framein 홈"><img class="footer-logo" src="/assets/framein-bi.png" alt="framein"><span>by Frameout</span></a><span class="footer-sep">·</span><span>MIT</span><span class="footer-sep">·</span><a href="https://github.com/framein-dev/framein">GitHub</a><span class="footer-sep">·</span><a href="https://frameout.co.kr">frameout.co.kr</a><span class="footer-sep">·</span><a href="mailto:axc@frameout.co.kr">axc@frameout.co.kr</a></div>
+</footer>
+</body>
+</html>

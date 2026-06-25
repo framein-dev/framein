@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Framein - One work frame across Claude, Codex, and Gemini</title>
+<meta name="description" content="Framein keeps one local work frame across Claude, Codex, Gemini, and AI coding agents: task contract, challenge loop, model-switch capsule, and validation gate.">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+<meta name="author" content="Frameout">
+<meta name="application-name" content="Framein">
+<meta name="theme-color" content="#f6f6f1">
+<link rel="icon" href="/assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="canonical" href="https://www.framein.dev/">
+<link rel="alternate" hreflang="en" href="https://www.framein.dev/">
+<link rel="alternate" hreflang="ko" href="https://www.framein.dev/ko">
+<link rel="alternate" hreflang="x-default" href="https://www.framein.dev/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Framein - One work frame across Claude, Codex, and Gemini">
+<meta property="og:description" content="Start with one agent, challenge it with another, switch when needed, and close the work with validation.">
+<meta property="og:url" content="https://www.framein.dev/">
+<meta property="og:site_name" content="Framein">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ko_KR">
+<meta property="og:image" content="https://www.framein.dev/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Framein work frame preview">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Framein - One work frame across Claude, Codex, and Gemini">
+<meta name="twitter:description" content="Start with one agent, challenge it with another, switch when needed, and close the work with validation.">
+<meta name="twitter:image" content="https://www.framein.dev/assets/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://frameout.co.kr/#organization",
+      "name": "Frameout",
+      "url": "https://frameout.co.kr/",
+      "email": "axc@frameout.co.kr"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.framein.dev/#website",
+      "name": "Framein",
+      "url": "https://www.framein.dev/",
+      "inLanguage": ["en", "ko"],
+      "publisher": { "@id": "https://frameout.co.kr/#organization" }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://www.framein.dev/#software",
+      "name": "Framein",
+      "alternateName": "framein",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Windows, macOS, Linux",
+      "softwareVersion": "0.0.4",
+      "url": "https://www.framein.dev/",
+      "image": "https://www.framein.dev/assets/og-image.png",
+      "codeRepository": "https://github.com/framein-dev/framein",
+      "license": "https://opensource.org/license/mit",
+      "programmingLanguage": "TypeScript",
+      "description": "Framein keeps one local work frame across Claude, Codex, Gemini, and AI coding agents.",
+      "publisher": { "@id": "https://frameout.co.kr/#organization" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.framein.dev/#webpage",
+      "url": "https://www.framein.dev/",
+      "name": "Framein - One work frame across Claude, Codex, and Gemini",
+      "description": "Framein keeps one local work frame across Claude, Codex, Gemini, and AI coding agents.",
+      "inLanguage": "en",
+      "isPartOf": { "@id": "https://www.framein.dev/#website" },
+      "about": { "@id": "https://www.framein.dev/#software" }
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --bg:#f6f6f1; --panel:#ffffff; --ink:#202124; --muted:#5f6268; --soft:#e7e7df;
+    --line:#d7d7cf; --brand:#476900; --brand-2:#0f6b55; --warn:#8f5d00; --danger:#b42336;
+    --code:#0d0f11; --code-text:#ecefe7; --code-dim:#9aa09a; --ok:#7bd88f; --fail:#ff9b9b; --accent:#d7ff5f;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.62;-webkit-font-smoothing:antialiased}
+  a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:20;background:rgba(246,246,241,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+  .nav{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .brand{display:inline-flex;align-items:center;color:var(--ink);text-decoration:none}.brand:hover{text-decoration:none}.brand-logo{display:block;width:118px;height:auto}
+  nav{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+  nav a{font-size:14px;color:var(--muted)} nav a.primary{color:var(--brand);font-weight:750}
+  section{padding:68px 0;border-top:1px solid var(--line)} section.hero{border-top:0;padding:70px 0 64px}
+  .hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(340px,.92fr);gap:38px;align-items:center}
+  .eyebrow{color:var(--brand);font-size:12px;font-weight:850;letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px}
+  h1{font-size:clamp(36px,4.8vw,54px);line-height:1.04;margin:0 0 22px;letter-spacing:0;max-width:22ch;text-wrap:balance}
+  h2{font-size:clamp(28px,3.7vw,40px);line-height:1.14;margin:0 0 18px;letter-spacing:0;max-width:25ch;text-wrap:balance}
+  h3{font-size:18px;line-height:1.25;margin:0 0 8px;letter-spacing:0}
+  p{margin:0 0 16px;text-wrap:pretty}.lead{font-size:20px;color:#37393d;max-width:56ch;text-wrap:pretty}.muted{color:var(--muted)}.small{font-size:14px}.tight{max-width:68ch}.headline-lines span{display:block}.hero h1.headline-lines span{white-space:nowrap}
+  .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border-radius:8px;background:var(--brand);color:#fff;font-weight:780;font-size:14px;border:1px solid var(--brand)}
+  .btn:hover{text-decoration:none;filter:brightness(.96)}.btn.secondary{background:transparent;color:var(--brand)}
+  code,pre,.mono{font-family:"Geist Mono","JetBrains Mono","Cascadia Mono",Consolas,monospace}
+  code{font-size:.9em;background:var(--soft);border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+  pre{margin:0;background:var(--code);color:var(--code-text);border-radius:8px;border:1px solid #1d2224;padding:18px;overflow:auto;font-size:13px;line-height:1.58;box-shadow:0 18px 50px rgba(15,15,16,.16)}
+  pre code{background:none;border:0;padding:0;color:inherit}.dim{color:var(--code-dim)}.ok{color:var(--ok)}.fail{color:var(--fail)}.accent{color:var(--accent)}.warn{color:#ffd27a}
+  .status-strip{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}.pill{border:1px solid var(--line);background:rgba(255,255,255,.68);border-radius:999px;padding:7px 10px;font-size:13px;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid.two{grid-template-columns:repeat(2,1fr)}.grid.four{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px}.card strong{display:block;margin-bottom:5px}
+  .number{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#e4efd2;color:#2d5200;font-weight:850;margin-bottom:12px}
+  table{border-collapse:collapse;width:100%;font-size:14px;background:var(--panel);border-radius:8px;overflow:hidden}th,td{border:1px solid var(--line);padding:12px 13px;text-align:left;vertical-align:top}th{background:var(--soft)}
+  .compare-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.compare-item{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.compare-item strong{display:block;margin-bottom:6px}.compare-item p{margin:0}
+  .split{display:grid;grid-template-columns:.78fr 1.22fr;gap:34px;align-items:start}
+  .callout{border-left:4px solid var(--brand-2);padding:12px 0 12px 16px;color:#34373a;background:linear-gradient(90deg,rgba(15,107,85,.08),transparent)}
+  footer{border-top:1px solid var(--line);padding:30px 0 54px;color:var(--muted);font-size:13px}.footer-inner{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}.footer-brand{display:inline-flex;align-items:flex-end;gap:8px;color:var(--ink);text-decoration:none}.footer-brand:hover{text-decoration:none}.footer-logo{display:block;width:88px;height:auto}.footer-brand span{color:var(--muted);font-weight:500;font-size:11px;line-height:1;margin-bottom:7px}.footer-sep{color:var(--line)}
+  @media(max-width:880px){.split{grid-template-columns:1fr}.grid,.grid.two,.grid.four{grid-template-columns:1fr}.nav{align-items:flex-start;padding:14px 24px}.brand-logo{width:106px}nav{justify-content:flex-start}}
+  @media(max-width:760px){.hero-grid{grid-template-columns:1fr}}
+  @media(max-width:640px){.wrap{padding:0 18px}.nav{min-height:64px;align-items:center;padding:18px 24px 14px;gap:14px}.brand-logo{width:98px}nav{gap:14px}section{padding:50px 0}section.hero{padding:48px 0 46px}.hero-grid{gap:28px}.eyebrow{font-size:11px;margin-bottom:12px}h1{font-size:clamp(32px,8.8vw,36px);line-height:1.05;max-width:100%}h2{font-size:30px;line-height:1.16;max-width:100%}.lead{font-size:18px;line-height:1.56}.actions{gap:10px;margin-top:22px}.btn{flex:1 1 180px;min-height:44px}.status-strip{gap:8px;margin-top:18px}.pill{font-size:12px;padding:6px 9px}.card,.compare-item{padding:16px}.compare-list{grid-template-columns:1fr}pre{font-size:11.5px;line-height:1.54;padding:14px;box-shadow:0 14px 34px rgba(15,15,16,.14)}pre,pre code{white-space:pre-wrap;overflow-wrap:anywhere}table{font-size:13px}th,td{padding:10px}.footer-inner{gap:8px}.footer-logo{width:76px}.footer-brand span{font-size:10px;margin-bottom:6px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/" aria-label="framein home"><img class="brand-logo" src="/assets/framein-bi.png" alt="framein"></a>
+    <nav aria-label="Main navigation">
+      <a class="primary" href="https://github.com/framein-dev/framein">GitHub</a>
+      <a href="/ko">KO</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Local work frame for AI coding</div>
+        <h1 class="headline-lines"><span>Keep one</span><span>work frame</span><span>across Claude,</span><span>Codex, and Gemini.</span></h1>
+        <p class="lead">Start with one agent, challenge it with another, switch when needed, and close the work with validation. Framein keeps a shared task contract, decision trail, risk state, validation results, and model-switch capsule under the workflow you already use.</p>
+        <div class="actions">
+          <a class="btn" href="#start">Try the work loop</a>
+          <a class="btn secondary" href="https://github.com/framein-dev/framein">Read the README</a>
+          <a class="btn secondary" href="https://github.com/framein-dev/framein/blob/main/docs/MANUAL.md">Open the Manual</a>
+        </div>
+        <div class="status-strip" aria-label="Project status">
+          <span class="pill">pre-release v0.0.4</span>
+          <span class="pill">243 tests</span>
+          <span class="pill">zero runtime dependencies</span>
+          <span class="pill">Node 22.5+</span>
+        </div>
+      </div>
+      <pre aria-label="Framein terminal transcript"><code><span class="dim"># Start in the agent you already use.</span>
+<span class="accent">$ framein start "add Google OAuth"</span>
+contract <span class="ok">set</span>: preserve email login
+lead claude
+
+<span class="dim"># Ask a different model for a bounded objection.</span>
+<span class="accent">$ framein challenge "OAuth callback state in session" --run</span>
+reviewer codex
+verdict <span class="warn">change required</span>
+required add nonce/state validation
+
+<span class="dim"># Switch when needed; close with validation.</span>
+<span class="accent">$ framein capsule gemini</span>
+next lead prepared from facts:
+contract · diff · tests · decisions
+
+<span class="accent">$ framein ship</span>
+build <span class="ok">ok</span> · tests <span class="ok">42/42</span>
+risk <span class="warn">high: auth/ touched</span>
+=> READY WITH HUMAN GATE</code></pre>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">Why this exists</div>
+        <h2 class="headline-lines"><span>Better prompts help.</span><span>They do not keep the work intact.</span></h2>
+      </div>
+      <div class="tight">
+        <p>Good PRDs, plans, ADRs, and skills help any model do better work. The pain starts when the lead model stalls, another model should challenge the plan, quota or model fit pushes you to switch, or the final answer still needs real validation.</p>
+        <p class="callout"><strong>Framein is not a new IDE or an automatic agent team.</strong> It keeps one local work frame under the Claude, Codex, Gemini, and skill workflows you already use.</p>
+      </div>
+    </div>
+    <div class="wrap grid four" style="margin-top:26px">
+      <div class="card"><strong>Stalled lead model</strong><span class="muted small">One agent keeps circling the same plan or failure mode.</span></div>
+      <div class="card"><strong>One-model blind spots</strong><span class="muted small">Architecture, security, and test concerns need an outside model's view.</span></div>
+      <div class="card"><strong>Reset on switch</strong><span class="muted small">Changing model often means explaining the same intent, risk, and decisions again.</span></div>
+      <div class="card"><strong>Unverified finish</strong><span class="muted small">The last answer still needs build, tests, risk, and human gates before ship.</span></div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap">
+      <div class="eyebrow">The loop</div>
+      <h2 class="headline-lines"><span>Start. Challenge.</span><span>Switch. Validate.</span></h2>
+      <div class="grid four">
+        <div class="card"><span class="number">1</span><h3>Start</h3><p class="muted small"><code>framein start</code> turns the request into a shared task contract before the implementation drifts.</p></div>
+        <div class="card"><span class="number">2</span><h3>Challenge</h3><p class="muted small"><code>framein challenge</code> asks a different reviewer role for a bounded objection when the work deserves another view.</p></div>
+        <div class="card"><span class="number">3</span><h3>Switch</h3><p class="muted small"><code>framein capsule</code> prepares the next lead from local facts: contract, diff, validation, ADRs, and ledger.</p></div>
+        <div class="card"><span class="number">4</span><h3>Validate</h3><p class="muted small"><code>framein verify</code> and <code>ship</code> close the loop with deterministic build/test checks and risk gates.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">Familiar surface</div>
+        <h2 class="headline-lines"><span>Call it like a skill.</span><span>Store it like project state.</span></h2>
+      </div>
+      <div>
+        <div class="compare-list">
+          <div class="compare-item"><strong>Claude and Gemini slash commands</strong><p class="muted small"><code>/fr:*</code> calls the same local engine from the agent session.</p></div>
+          <div class="compare-item"><strong>Codex project skills</strong><p class="muted small"><code>$fr-*</code> exposes the same verbs without deprecated prompt files.</p></div>
+          <div class="compare-item"><strong>Existing skill packs and personas</strong><p class="muted small">Keep your prompt framework. Framein supplies the shared contract, ledger, and gates underneath.</p></div>
+          <div class="compare-item"><strong>Terminal, CI, and MCP clients</strong><p class="muted small">The CLI, JSON output, wrappers, and MCP server all read and write the same local work frame.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">Start in a real repo</div>
+        <h2 class="headline-lines"><span>Install once.</span><span>Keep the frame under your agents.</span></h2>
+        <p class="muted">Public npm is not live yet. The commands below use the GitHub Release installer; in day-to-day use, agents can call the same work-frame verbs through <code>/fr:*</code> or <code>$fr-*</code>.</p>
+      </div>
+      <pre><code>curl -fsSL https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.sh | sh
+framein --version
+
+cd your-project
+framein init
+framein integrations install all --write
+
+framein start "complete the smallest safe change"
+
+# when another model should review or continue
+framein challenge "review the plan before implementation" --run
+framein capsule codex
+
+framein verify
+framein ship</code></pre>
+    </div>
+  </section>
+
+  <section id="trust">
+    <div class="wrap split">
+      <div>
+        <div class="eyebrow">Trust boundary</div>
+        <h2 class="headline-lines"><span>Local first.</span><span>No credential relay.</span></h2>
+      </div>
+      <div class="grid two">
+        <div class="card">
+          <h3>Local work frame</h3>
+          <p class="muted small">Task contract, ADRs, memory, ledger, validation results, and write locks live in your repo. The SQLite store is a cache; the JSON snapshot is git-friendly.</p>
+        </div>
+        <div class="card">
+          <h3>No proxy layer</h3>
+          <p class="muted small">Framein does not collect provider credentials, pool subscriptions, relay MCP tools, or screen-scrape terminal I/O (TTY). It calls official CLIs locally when you ask it to.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-inner"><a class="footer-brand" href="/" aria-label="framein home"><img class="footer-logo" src="/assets/framein-bi.png" alt="framein"><span>by Frameout</span></a><span class="footer-sep">·</span><span>MIT</span><span class="footer-sep">·</span><a href="https://github.com/framein-dev/framein">GitHub</a><span class="footer-sep">·</span><a href="https://frameout.co.kr">frameout.co.kr</a><span class="footer-sep">·</span><a href="mailto:axc@frameout.co.kr">axc@frameout.co.kr</a></div>
+</footer>
+</body>
+</html>

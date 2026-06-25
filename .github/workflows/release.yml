@@ -1,0 +1,194 @@
+name: release
+# SEA binaries for all platforms (ADR-0014). SEA cannot cross-compile, so each asset builds on its own OS.
+# Two modes: workflow_dispatch = build + upload artifacts ONLY (CI smoke test, no release);
+#            push of a v* tag    = build + attach binaries to the GitHub Release.
+# Code signing is conditional. Windows signing remains pending; macOS signs/notarizes when the
+# Apple Developer ID secrets are configured.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      notarize_macos:
+        description: 'Submit macOS artifacts to Apple notarization when Apple secrets are configured'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, asset: framein-win-x64.exe, out: build/sea/framein.exe }
+          - { os: macos-latest,   asset: framein-macos-arm64, out: build/sea/framein }
+          - { os: macos-13,       asset: framein-macos-x64,   out: build/sea/framein }
+          - { os: ubuntu-latest,  asset: framein-linux-x64,   out: build/sea/framein }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'   # >= 22.5; 22.x runs node:sqlite without the experimental flag
+      - run: npm ci
+      - run: npm run build:sea
+
+      - name: smoke SEA binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $exe = Join-Path "${{ github.workspace }}" "${{ matrix.out }}"
+          & $exe --version
+
+          $smoke = Join-Path $env:RUNNER_TEMP 'framein-sea-smoke'
+          Remove-Item -LiteralPath $smoke -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Path $smoke | Out-Null
+          Push-Location $smoke
+          $pkg = @{
+            name = 'framein-smoke'
+            scripts = @{
+              build = 'node -e "process.exit(0)"'
+              test = 'node -e "console.log(''pass 1''); console.log(''fail 0'')"'
+            }
+          } | ConvertTo-Json -Depth 3
+          [System.IO.File]::WriteAllText((Join-Path (Get-Location) 'package.json'), $pkg, (New-Object System.Text.UTF8Encoding $false))
+          & $exe init
+          & $exe start "release artifact smoke"
+          & $exe task amend acceptance "build and test scripts pass"
+          & $exe verify
+          & $exe integrations install all --write
+          & $exe status
+          Pop-Location
+
+      - name: smoke SEA binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          exe="${{ github.workspace }}/${{ matrix.out }}"
+          chmod +x "$exe"
+          "$exe" --version
+
+          smoke="$RUNNER_TEMP/framein-sea-smoke"
+          rm -rf "$smoke"
+          mkdir -p "$smoke"
+          cd "$smoke"
+          node <<'NODE'
+          const fs = require('node:fs');
+          fs.writeFileSync('package.json', JSON.stringify({
+            name: 'framein-smoke',
+            scripts: {
+              build: 'node -e "process.exit(0)"',
+              test: 'node -e "console.log(\'pass 1\'); console.log(\'fail 0\')"',
+            },
+          }));
+          NODE
+          "$exe" init
+          "$exe" start "release artifact smoke"
+          "$exe" task amend acceptance "build and test scripts pass"
+          "$exe" verify
+          "$exe" integrations install all --write
+          "$exe" status
+
+      # Windows signing remains future release-hardening work.
+      - name: sign macOS SEA binary
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          APPLE_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_KEYCHAIN_PASSWORD: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+          MACOS_CODESIGN_IDENTITY: ${{ secrets.MACOS_CODESIGN_IDENTITY }}
+        run: |
+          if [[ -z "${APPLE_CERTIFICATE_P12_BASE64:-}" ]]; then
+            echo "No APPLE_CERTIFICATE_P12_BASE64 secret; leaving macOS artifact ad-hoc signed."
+            exit 0
+          fi
+          : "${APPLE_CERTIFICATE_PASSWORD:?APPLE_CERTIFICATE_PASSWORD secret is required}"
+
+          p12="$RUNNER_TEMP/developer-id-application.p12"
+          keychain="$RUNNER_TEMP/framein-signing.keychain-db"
+          keychain_password="${APPLE_KEYCHAIN_PASSWORD:-$(uuidgen)}"
+
+          if ! printf '%s' "$APPLE_CERTIFICATE_P12_BASE64" | base64 --decode > "$p12" 2>/dev/null; then
+            printf '%s' "$APPLE_CERTIFICATE_P12_BASE64" | base64 -D > "$p12"
+          fi
+
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$p12" -P "$APPLE_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$keychain"
+          security list-keychains -d user -s "$keychain"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$keychain"
+
+          identity="${MACOS_CODESIGN_IDENTITY:-}"
+          if [[ -z "$identity" ]]; then
+            identity="$(security find-identity -v -p codesigning "$keychain" | sed -n 's/.*"\(Developer ID Application:.*\)"/\1/p' | head -n 1)"
+          fi
+          if [[ -z "$identity" ]]; then
+            echo "No Developer ID Application identity found in APPLE_CERTIFICATE_P12_BASE64." >&2
+            security find-identity -v -p codesigning "$keychain" || true
+            exit 1
+          fi
+          if [[ "$identity" != Developer\ ID\ Application:* ]]; then
+            echo "Refusing to sign release artifact with non-Developer-ID identity: $identity" >&2
+            exit 1
+          fi
+
+          codesign --force --sign "$identity" --options runtime --timestamp "${{ matrix.out }}"
+          codesign --verify --deep --strict --verbose=2 "${{ matrix.out }}"
+          "${{ github.workspace }}/${{ matrix.out }}" --version
+
+      - name: notarize macOS SEA binary
+        if: runner.os == 'macOS' && (startsWith(github.ref, 'refs/tags/') || github.event.inputs.notarize_macos == 'true')
+        shell: bash
+        env:
+          APPLE_CERTIFICATE_P12_BASE64: ${{ secrets.APPLE_CERTIFICATE_P12_BASE64 }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          if [[ -z "${APPLE_CERTIFICATE_P12_BASE64:-}" ]]; then
+            echo "No APPLE_CERTIFICATE_P12_BASE64 secret; skipping notarization."
+            exit 0
+          fi
+          : "${APPLE_ID:?APPLE_ID secret is required}"
+          : "${APPLE_TEAM_ID:?APPLE_TEAM_ID secret is required}"
+          : "${APPLE_APP_PASSWORD:?APPLE_APP_PASSWORD secret is required}"
+
+          zip="$RUNNER_TEMP/${{ matrix.asset }}.zip"
+          ditto -c -k --keepParent "${{ matrix.out }}" "$zip"
+          xcrun notarytool submit "$zip" \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_PASSWORD" \
+            --wait
+          xcrun stapler staple -v "${{ matrix.out }}" || echo "Stapling skipped; bare CLI executables may rely on online notarization lookup."
+
+      - name: stage asset
+        shell: bash
+        run: |
+          mkdir -p dist-bin
+          cp "${{ matrix.out }}" "dist-bin/${{ matrix.asset }}"
+          chmod +x "dist-bin/${{ matrix.asset }}" || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist-bin/${{ matrix.asset }}
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')   # only a real v* tag produces a release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist-bin
+          merge-multiple: true
+      - name: checksums
+        run: cd dist-bin && sha256sum framein-* > SHA256SUMS.txt   # framein-* only; do not hash the sums file itself
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist-bin/*

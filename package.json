@@ -1,0 +1,48 @@
+{
+  "name": "framein",
+  "version": "0.0.4",
+  "description": "Local work frame for Claude, Codex, Gemini, and AI coding agents.",
+  "type": "module",
+  "homepage": "https://www.framein.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/framein-dev/framein.git"
+  },
+  "bugs": {
+    "url": "https://github.com/framein-dev/framein/issues"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "cli",
+    "claude",
+    "codex",
+    "gemini",
+    "validation"
+  ],
+  "bin": {
+    "framein": "dist/bin.js",
+    "fr": "dist/bin.js",
+    "frame": "dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:sea": "npm run build && node scripts/build-sea.mjs",
+    "test": "npm run build && node --no-warnings --test \"dist/**/*.test.js\"",
+    "framein": "node --no-warnings dist/cli.js",
+    "frame": "node --no-warnings dist/cli.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "esbuild": "^0.28.1",
+    "postject": "^1.0.0-alpha.6",
+    "typescript": "^6.0.3"
+  }
+}

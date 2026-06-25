@@ -1,0 +1,8 @@
+node_modules/
+.frame/
+build/
+# ^ SEA build artifacts (build/sea/framein.exe, blob, bundle) - large binaries, never source.
+*.tgz
+# ^ release tarballs (e.g. `gh release download` output, `npm pack`) - never source.
+# dist/ is committed on purpose so source installs and release builds can run on a clean machine.
+# Rebuild with `npm run build` before committing.

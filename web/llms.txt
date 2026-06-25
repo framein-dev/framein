@@ -1,0 +1,37 @@
+# Framein
+
+> Framein keeps one local work frame across Claude, Codex, Gemini, and AI coding agents.
+
+Framein helps developers start with one agent, challenge the work with another, switch lead model when needed, and close the work with validation. It keeps a shared local task contract, decision trail, risk state, validation results, and model-switch capsule underneath the agent workflow they already use.
+
+## Canonical Pages
+
+- English overview: https://www.framein.dev/
+- Korean overview: https://www.framein.dev/ko
+- Source repository: https://github.com/framein-dev/framein
+- Company: https://frameout.co.kr
+
+## Naming
+
+- Prose product name: Framein
+- Logo, CLI command, npm package, binary, and file/id form: framein
+- Aliases: fr, frame
+- Agent command namespaces: /fr:* for Claude and Gemini, $fr-* for Codex
+
+## Core Commands
+
+- framein init: create local state and project managed blocks
+- framein start "<goal>": define the task contract
+- framein challenge "<proposal>" --run: ask a bounded independent reviewer
+- framein capsule [agent]: prepare a model switch from local facts
+- framein verify: run configured build and test validation
+- framein risk: inspect sensitive diff areas
+- framein ship: check whether the work is ready to ship
+
+## Trust Boundary
+
+Framein is local-first. It does not collect provider credentials, pool subscriptions, relay MCP tools, or screen-scrape terminal I/O. Provider authentication stays with the official CLI for each provider.
+
+## Current Status
+
+Framein is pre-release. Public executable distribution is not yet marked ready until CI artifacts, signing, notarization, and smoke tests are complete.
