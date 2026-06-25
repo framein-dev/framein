@@ -29,7 +29,7 @@ The installer downloads the latest `framein-win-x64.exe` release asset, verifies
 when present, installs the binary under the user profile, and adds that directory to the user PATH.
 Open a new terminal if `framein` is not immediately found.
 
-Windows release signing is being prepared through SignPath. See the
+Windows release signing is being prepared through SignPath Foundation OSS code signing. See the
 [code signing policy](CODE_SIGNING.md) for the release-signing model, current pre-release status,
 and uninstall instructions.
 
