@@ -16,7 +16,7 @@
 import { build } from 'esbuild';
 import { inject } from 'postject';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, rmSync, writeFileSync, readFileSync, statSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const OUT = 'build/sea';
@@ -29,6 +29,38 @@ const blobPath = join(OUT, 'framein.blob');
 const FUSE = 'NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2'; // Node's standard SEA sentinel fuse
 
 const version = JSON.parse(readFileSync('package.json', 'utf8')).version;
+
+function findWindowsSignTool() {
+  const candidates = [];
+
+  try {
+    const found = execFileSync('where.exe', ['signtool.exe'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim().split(/\r?\n/)[0];
+    if (found) candidates.push(found);
+  } catch {
+    // SignTool is often installed with the Windows SDK, but not on PATH.
+  }
+
+  const sdkRoots = [
+    process.env.WindowsSdkDir ? join(process.env.WindowsSdkDir, 'bin') : '',
+    'C:\\Program Files (x86)\\Windows Kits\\10\\bin',
+    'C:\\Program Files\\Windows Kits\\10\\bin',
+  ].filter(Boolean);
+
+  for (const root of sdkRoots) {
+    try {
+      for (const versionDir of readdirSync(root).sort().reverse()) {
+        candidates.push(join(root, versionDir, 'x64', 'signtool.exe'));
+      }
+    } catch {
+      // Missing SDK root; try the next candidate.
+    }
+  }
+
+  return candidates.find((candidate) => existsSync(candidate));
+}
 
 // Banner runs before any bundled module. Under SEA, process.argv is [exe, exe, ...args] — the exe path
 // appears twice, which already matches the [node, script, ...args] shape cli.ts's argv.slice(2) expects,
@@ -62,6 +94,16 @@ const isMac = process.platform === 'darwin';
 
 console.log(`3/4 copying the Node runtime → ${exeName}…`);
 copyFileSync(process.execPath, exePath);
+// Windows: official node.exe carries an Authenticode signature. postject modifies the PE after copy;
+// if that signature is left in place, the certificate table becomes corrupt and signing services
+// reject the artifact as an invalid PE. Strip it before injection; SignPath signs the final exe later.
+if (isWin) {
+  const signTool = findWindowsSignTool();
+  if (!signTool) {
+    throw new Error('signtool.exe is required to strip the copied node.exe signature before SEA injection.');
+  }
+  execFileSync(signTool, ['remove', '/s', exePath], { stdio: 'inherit' });
+}
 // macOS Mach-O: the copied node is signed; postject must inject into an UNSIGNED binary, so strip first.
 if (isMac) { try { execFileSync('codesign', ['--remove-signature', exePath]); } catch (e) { console.warn('  (codesign --remove-signature skipped:', e.message + ')'); } }
 
