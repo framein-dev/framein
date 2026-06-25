@@ -5,6 +5,8 @@ binary from GitHub Releases.
 
 Korean guide: [INSTALL.ko.md](INSTALL.ko.md)
 
+Code signing policy: [CODE_SIGNING.md](CODE_SIGNING.md)
+
 ## 0. Requirements
 
 - **A supported OS:** Windows x64, macOS arm64/x64, or Linux x64.
@@ -26,6 +28,10 @@ framein --version
 The installer downloads the latest `framein-win-x64.exe` release asset, verifies `SHA256SUMS.txt`
 when present, installs the binary under the user profile, and adds that directory to the user PATH.
 Open a new terminal if `framein` is not immediately found.
+
+Windows release signing is being prepared through SignPath. See the
+[code signing policy](CODE_SIGNING.md) for the release-signing model, current pre-release status,
+and uninstall instructions.
 
 Manual fallback:
 
@@ -91,7 +97,26 @@ framein --version
 Node.js 22.5.0 or newer is required because the source build uses the built-in experimental
 `node:sqlite` module.
 
-## 5. Troubleshooting
+## 5. Uninstall
+
+Windows PowerShell:
+
+```powershell
+$dir = Join-Path $env:LOCALAPPDATA 'Programs\framein'
+Remove-Item -LiteralPath (Join-Path $dir 'framein.exe') -Force -ErrorAction SilentlyContinue
+
+$userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+$newPath = (($userPath -split ';') | Where-Object { $_ -and $_ -ne $dir }) -join ';'
+[Environment]::SetEnvironmentVariable('Path', $newPath, 'User')
+```
+
+macOS / Linux:
+
+```bash
+rm -f "${FRAMEIN_BIN:-$HOME/.local/bin}/framein"
+```
+
+## 6. Troubleshooting
 
 ### Windows blocks `.ps1` scripts
 

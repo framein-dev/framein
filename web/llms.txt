@@ -9,6 +9,7 @@ Framein helps developers start with one agent, challenge the work with another, 
 - English overview: https://www.framein.dev/
 - Korean overview: https://www.framein.dev/ko
 - Source repository: https://github.com/framein-dev/framein
+- Code signing policy: https://github.com/framein-dev/framein/blob/main/docs/CODE_SIGNING.md
 - Company: https://frameout.co.kr
 
 ## Naming
@@ -31,6 +32,10 @@ Framein helps developers start with one agent, challenge the work with another, 
 ## Trust Boundary
 
 Framein is local-first. It does not collect provider credentials, pool subscriptions, relay MCP tools, or screen-scrape terminal I/O. Provider authentication stays with the official CLI for each provider.
+
+## Code Signing Policy
+
+Windows release signing is being prepared through SignPath Foundation OSS signing. The public policy covers signing roles, privacy, uninstall, and verification: https://github.com/framein-dev/framein/blob/main/docs/CODE_SIGNING.md
 
 ## Current Status
 

@@ -17,7 +17,7 @@ start in Claude -> challenge with Codex -> switch when needed -> validate before
 Status: **pre-release** (`v0.0.4`). Runtime dependencies: **zero**. Required Node:
 **22.5.0+**.
 
-[Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [Install notes](docs/INSTALL.md) · [Test scenarios](docs/TEST-SCENARIOS.md) · [Security](SECURITY.md)
+[Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Test scenarios](docs/TEST-SCENARIOS.md) · [Security](SECURITY.md)
 
 ## Why Framein?
 
@@ -209,6 +209,7 @@ Still being validated:
 
 - macOS/Linux install and runtime paths
 - signed executable release hardening for Windows and macOS
+- SignPath Foundation OSS code-signing approval and automated Windows release signing
 - multi-developer workflows
 - interactive lobby paths such as `/lead`, `/go`, and inline command palette
 - public npm release and signed executable distribution
@@ -238,6 +239,7 @@ Node **22.5.0+** is required because Framein uses built-in `node:sqlite`.
 - Manual: [`docs/MANUAL.md`](docs/MANUAL.md)
 - Korean manual backup: [`docs/MANUAL.ko.md`](docs/MANUAL.ko.md)
 - Install troubleshooting: [`docs/INSTALL.md`](docs/INSTALL.md) / [`docs/INSTALL.ko.md`](docs/INSTALL.ko.md)
+- Code signing policy: [`docs/CODE_SIGNING.md`](docs/CODE_SIGNING.md)
 - Test scenarios: [`docs/TEST-SCENARIOS.md`](docs/TEST-SCENARIOS.md)
 - ADRs: [`docs/adr/`](docs/adr/)
 - Website: [framein.dev](https://www.framein.dev)
