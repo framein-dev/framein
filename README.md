@@ -17,7 +17,7 @@ start in Claude -> challenge with Codex -> switch when needed -> validate before
 Status: **pre-release** (`v0.0.4`). Runtime dependencies: **zero**. Required Node:
 **22.5.0+**.
 
-[Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Test scenarios](docs/TEST-SCENARIOS.md) · [Security](SECURITY.md)
+[Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Security](SECURITY.md)
 
 ## Why Framein?
 
@@ -240,8 +240,6 @@ Node **22.5.0+** is required because Framein uses built-in `node:sqlite`.
 - Korean manual backup: [`docs/MANUAL.ko.md`](docs/MANUAL.ko.md)
 - Install troubleshooting: [`docs/INSTALL.md`](docs/INSTALL.md) / [`docs/INSTALL.ko.md`](docs/INSTALL.ko.md)
 - Code signing policy: [`docs/CODE_SIGNING.md`](docs/CODE_SIGNING.md)
-- Test scenarios: [`docs/TEST-SCENARIOS.md`](docs/TEST-SCENARIOS.md)
-- ADRs: [`docs/adr/`](docs/adr/)
 - Website: [framein.dev](https://www.framein.dev)
 
 ## License

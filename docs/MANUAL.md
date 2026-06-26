@@ -5,7 +5,7 @@
 > tools. You do not need to learn a new prompt window. Automation-facing commands also support
 > `--json` where the command has a stable structured output.
 
-> **Default usage = agent-driven workflow (ADR-0012/0016).** `framein init` projects operating guidance
+> **Default usage = agent-driven workflow.** `framein init` projects operating guidance
 > into native context files. In normal use, the agent can create the task contract near the start of
 > work, call another model for a bounded challenge, prepare a model switch when needed, and run
 > validation before it calls the task done. Long-form `framein <verb>` commands are the fallback and
@@ -18,7 +18,6 @@
 > frameworks, skill packs, role workflows, or your own agent setup. Framein adds the missing work
 > frame underneath: a task contract, decision trail, bounded challenge loop, model-switch capsule,
 > deterministic build/test validation, and blast-radius checks.
-> See [ADR-0016](./adr/0016-work-frame-across-agents-positioning.md).
 
 This is the default English manual. The Korean original is preserved at
 [`docs/MANUAL.ko.md`](./MANUAL.ko.md).
@@ -82,18 +81,18 @@ object, risk rises, and validation closes the task.
 
 ## 2. Design Philosophy
 
-Each principle is backed by an ADR under [`docs/adr/`](./adr/).
+These principles define the public behavior Framein tries to preserve.
 
-| Principle | Meaning | Source |
-|---|---|---|
-| **Control layer, not executor** | Framein does not drive or scrape the terminal. It observes through the shared store and ledger. | ADR-0008 |
-| **In-place by default** | Keep typing into the native CLI. Other roles are called into the current workflow rather than forcing a new prompt surface. | ADR-0006 |
-| **No relay** | Framein does not collect subscription credentials or route requests through a central account. Each CLI keeps its own official auth. | PRD section 2.3 |
-| **Audit cadence** | Do not review every turn. Call another model at gates or anomaly points only. | ADR-0005 |
-| **Fresh on read** | Sharing is pull-based. The promise is "latest facts are always readable", not automatic push. | PRD section 4.2 |
-| **Append-only ADRs** | Decisions are not updated or deleted. Corrections use `supersede`. | ADR-0001 and later |
-| **Zero runtime dependencies** | Runtime code uses Node built-ins only, including `node:sqlite`. | ADR-0003 |
-| **Reuse first** | Existing MCP servers and skills are detected, recommended, or registered. They are not proxied or reimplemented. | ADR-0002/0004 |
+| Principle | Meaning |
+|---|---|
+| **Control layer, not executor** | Framein does not drive or scrape the terminal. It observes through the shared store and ledger. |
+| **In-place by default** | Keep typing into the native CLI. Other roles are called into the current workflow rather than forcing a new prompt surface. |
+| **No relay** | Framein does not collect subscription credentials or route requests through a central account. Each CLI keeps its own official auth. |
+| **Audit cadence** | Do not review every turn. Call another model at gates or anomaly points only. |
+| **Fresh on read** | Sharing is pull-based. The promise is "latest facts are always readable", not automatic push. |
+| **Append-only decisions** | Decisions are not updated or deleted. Corrections use `supersede`. |
+| **Zero runtime dependencies** | Runtime code uses Node built-ins only, including `node:sqlite`. |
+| **Reuse first** | Existing MCP servers and skills are detected, recommended, or registered. They are not proxied or reimplemented. |
 
 ---
 
@@ -317,7 +316,7 @@ framein ship       # enforced gate: readiness, commit/deploy guidance, non-zero 
   the result.
 - `framein ship` adds the Blast Radius result when changed files touch sensitive areas.
 
-Older internal ADRs and code may refer to this as the "Evidence Gate". Public-facing copy now uses
+Older internal names may refer to this as the "Evidence Gate". Public-facing copy now uses
 "Validation Gate" to make the developer intent clearer.
 
 ### 7.3 Rescue Mode: Stop Repair Loops (`rescue`, `checkpoint`, `rewind`)
@@ -888,8 +887,8 @@ Code conventions:
 
 - ESM + `NodeNext`.
 - In TypeScript source, import local modules with explicit `.js` extensions.
-- Read [`README.md`](../README.md), this manual, and [`docs/adr/`](./adr/) before changing behavior
-  with product-level tradeoffs.
+- Read [`README.md`](../README.md) and this manual before changing behavior with product-level
+  tradeoffs.
 
 ---
 
