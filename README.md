@@ -5,10 +5,10 @@
 Start with one agent, challenge it with another, switch when needed, and close the work with
 validation.
 
-Framein is a local work-state layer for AI coding agents. Keep using Claude, Codex, Gemini,
-slash-command frameworks, skill packs, role-based workflows, or your own agent setup. Framein keeps
-the work underneath them stable: a task contract, decision trail, risk state, validation results, and
-a compact capsule the next model can read.
+Framein is a local work-state layer beneath the coding agents and harnesses you already use. Keep
+using Claude Code, Codex, Gemini, Pi, OpenCode, slash-command frameworks, skill packs, role-based
+workflows, or your own setup. Framein keeps the work underneath them stable: a task contract,
+decision trail, risk state, validation results, and a compact capsule the next model can read.
 
 ```text
 start in Claude -> challenge with Codex -> switch when needed -> validate before ship
@@ -17,7 +17,7 @@ start in Claude -> challenge with Codex -> switch when needed -> validate before
 Status: **public pre-release** (`v0.0.4`). Runtime dependencies: **zero**. Required Node:
 **22.5.0+**.
 
-[Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Security](SECURITY.md)
+[Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [FAQ](docs/FAQ.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Security](SECURITY.md)
 
 ## Demo
 
@@ -113,7 +113,7 @@ next lead prepared from facts:
 contract · diff · tests · decisions
 
 $ framein ship
-build ok · tests 42/42
+build ok · tests passed
 risk high: auth/ touched
 status ready with human gate
 ```
@@ -218,7 +218,7 @@ Solid in the current pre-release:
 - MCP stdio server and registration helpers
 - Headless delegation to real CLIs where available
 - Windows author environment live-verified
-- `244` automated tests passing
+- `240+` automated tests passing
 
 Still being validated:
 
@@ -249,6 +249,7 @@ Node **22.5.0+** is required because Framein uses built-in `node:sqlite`.
 ## Documentation
 
 - Manual: [`docs/MANUAL.md`](docs/MANUAL.md)
+- FAQ: [`docs/FAQ.md`](docs/FAQ.md)
 - Korean manual backup: [`docs/MANUAL.ko.md`](docs/MANUAL.ko.md)
 - Install troubleshooting: [`docs/INSTALL.md`](docs/INSTALL.md) / [`docs/INSTALL.ko.md`](docs/INSTALL.ko.md)
 - Code signing policy: [`docs/CODE_SIGNING.md`](docs/CODE_SIGNING.md)

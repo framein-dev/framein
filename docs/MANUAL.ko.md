@@ -138,7 +138,7 @@ git clone https://github.com/framein-dev/framein.git
 cd framein
 npm install      # 개발 도구
 npm run build    # tsc → dist/
-npm test         # 빌드 + 전체 테스트 (244개) — pass 244 / fail 0 이면 정상
+npm test         # 빌드 + 전체 테스트 — pass / fail 요약 확인
 ```
 
 ### 4.4 로컬 개발 실행 방법 (바이너리: `framein` · 별칭 `fr` / `frame`)
@@ -503,7 +503,7 @@ managed-block 본문 구조(예):
 
 ## 12. 현재 상태 (정직 고지)
 
-**구현·테스트 완료 (244 tests, green, zero runtime dep):**
+**구현·테스트 완료 (240+ tests, green, zero runtime dep):**
 - 코어(스토어·투영·managed-block·원자적 다중프로세스 락·텍스트 직렬화·역할 라우팅·ADR).
 - MCP/스킬 감지·등록, 스펙 준수 MCP 서버(initialize 네고·ping·inputSchema·isError, ADR-0007).
 - **제품 루프 P0~P2 전부:** Task Contract · Evidence Gate · Rescue · Capsule · Disagreement ·
@@ -565,7 +565,7 @@ OSS 릴리스 준비(LICENSE/CI/SECURITY 등).
 
 ```bash
 npm run build      # tsc → dist/
-npm test           # 빌드 후 dist/**/*.test.js 전체 (244개)
+npm test           # 빌드 후 dist/**/*.test.js 전체
 node --no-warnings --test dist/store.test.js                              # 한 파일
 node --no-warnings --test --test-name-pattern="supersede" dist/**/*.test.js   # 이름으로
 node --no-warnings dist/cli.js <cmd>                                      # 로컬 실행

@@ -758,14 +758,14 @@ Solid in the current pre-release:
 - Live CLI verification: headless delegation, MCP connection and tool calls, `trust`, interactive
   attach through `stdio:inherit`, structured model-ingest paths, and quota failover.
 - Windows author environment verified.
-- `242` automated tests passing.
+- `240+` automated tests passing.
 
 Still being validated:
 
-- macOS/Linux install and runtime paths.
+- Clean-machine smoke tests across supported npm platforms.
 - Multi-developer workflows.
 - Larger-scale use of model-generated narrative sections.
-- Public npm release.
+- Future release automation and package update workflow.
 - Signed cross-platform executable artifacts through GitHub Actions.
 
 Deliberately not bundled:
