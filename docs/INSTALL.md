@@ -1,6 +1,6 @@
 # Framein Install Guide
 
-Framein is a public pre-release. The default public install path is npm.
+Framein is a public pre-release. The supported cross-platform install path is npm.
 
 Korean guide: [INSTALL.ko.md](INSTALL.ko.md)
 
@@ -137,13 +137,31 @@ npm install -g .
 framein --version
 ```
 
-## 6. Standalone Binaries
+## 6. Standalone Executables
 
-Standalone Windows/macOS/Linux binaries are release-hardening work, not the current primary public
-install path. The Windows Authenticode signing route is not finalized: SignPath Foundation OSS has
-been requested, and commercial OV or another suitable signing path may be used if that proves more
-practical. macOS signing/notarization and clean-machine smoke tests are tracked separately before
-binary downloads are documented as the default path.
+Framein currently works on Windows, macOS, Linux, and WSL through npm. Node.js 22.5+ is the only
+required runtime for that path.
+
+Standalone executables are planned as an optional convenience path, not a replacement for npm. The
+main benefits are:
+
+- users can run Framein without installing Node/npm separately;
+- Windows users can avoid npm-generated `.ps1` shims and PowerShell execution-policy friction;
+- future package-manager paths such as `winget`, `scoop`, or Homebrew can point at release assets.
+
+The planned executable form bundles the Node runtime with Framein's code. It does not install Node
+globally or modify the user's system Node installation.
+
+There is no official standalone `.exe`, `.pkg`, `.dmg`, Linux binary package, `winget`, `scoop`, or
+Chocolatey install path for `v0.0.4`. Do not treat self-built, unsigned, or test-signed binaries as
+official releases. The expected future Windows path is a GitHub Release asset such as
+`framein-win-x64.exe`, accompanied by `SHA256SUMS.txt`, signature verification instructions, and
+clear signed/unsigned release notes.
+
+The Windows Authenticode signing route is not finalized: SignPath Foundation OSS has been requested,
+and commercial OV or another suitable signing path may be used if that proves more practical. macOS
+signing/notarization and clean-machine smoke tests are tracked separately before binary downloads
+are documented as the default path.
 
 ## 7. Verification
 

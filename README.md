@@ -47,12 +47,18 @@ For the longer origin story and design notes, see
 
 ## Quick Start
 
-npm is now the default public install path:
+npm is the supported cross-platform install path today:
 
 ```bash
 npm install -g framein
 framein --version
 ```
+
+Standalone executables are planned as an additional convenience path, mainly for users who do not
+want to install Node/npm or who want to avoid Windows npm shim and PowerShell execution-policy
+friction. They are not required to use Framein today. See
+[Install notes](docs/INSTALL.md#6-standalone-executables) and the
+[code signing policy](docs/CODE_SIGNING.md).
 
 If you want to test a local checkout instead:
 

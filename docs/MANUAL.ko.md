@@ -128,6 +128,10 @@ npm install -g framein
 framein --version
 ```
 
+이 npm 경로는 Node.js 22.5+ 환경의 Windows, macOS, Linux, WSL에서 동작합니다. Standalone 실행 파일은
+Node와 Framein을 함께 담는 추가 편의 경로로 준비 중이며, 주로 별도 Node/npm 설치와 Windows npm shim
+마찰을 줄이기 위한 것입니다. 현재 Framein을 쓰기 위해 필수인 경로는 아닙니다.
+
 ### 4.3 로컬 checkout 빌드 & 검증
 ```bash
 git clone https://github.com/framein-dev/framein.git

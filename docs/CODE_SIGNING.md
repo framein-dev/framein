@@ -1,8 +1,9 @@
 # Code signing policy
 
-Framein is preparing signed executable releases for Windows and macOS. This policy records the
-intended trust boundary for release signing and the temporary test-signing process used while the
-project is pre-release. Standalone binaries are not the primary public install path yet; npm is.
+Framein is preparing signed executable releases for Windows and macOS as an optional convenience
+path. The current supported cross-platform install path is npm. Planned standalone executables bundle
+the Node runtime with Framein's code so users do not need a separate Node/npm setup; they do not
+install Node globally or modify the user's system Node installation.
 
 ## Current status
 
@@ -81,8 +82,9 @@ Framein to run or delegate work.
 
 ## User-visible system changes
 
-The standalone installers place the Framein executable in a user-level binary directory and may add
-that directory to the user's `PATH`.
+The planned standalone install scripts place the Framein executable in a user-level binary directory
+and may add that directory to the user's `PATH`. They do not install Node as a separate system
+dependency; the runtime is part of the release executable.
 
 Windows installer script:
 

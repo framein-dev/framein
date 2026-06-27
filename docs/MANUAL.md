@@ -171,6 +171,10 @@ npm install -g framein
 framein --version
 ```
 
+This npm path works on Windows, macOS, Linux, and WSL with Node.js 22.5+. Standalone executables are
+planned as an additional convenience path that bundles Node with Framein, mainly to avoid separate
+Node/npm setup and Windows npm shim friction. They are not required to use Framein today.
+
 For local checkout testing:
 
 ```bash

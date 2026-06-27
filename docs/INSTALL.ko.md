@@ -1,6 +1,6 @@
 # Framein 설치 가이드
 
-Framein은 현재 public pre-release입니다. 기본 공개 설치 경로는 npm입니다.
+Framein은 현재 public pre-release입니다. 지원되는 크로스 플랫폼 설치 경로는 npm입니다.
 
 English guide: [INSTALL.md](INSTALL.md)
 
@@ -133,12 +133,31 @@ npm install -g .
 framein --version
 ```
 
-## 6. standalone binary 상태
+## 6. Standalone 실행 파일 상태
 
-Windows/macOS/Linux standalone binary는 아직 기본 공개 설치 경로가 아닙니다. Windows Authenticode
-서명 경로는 아직 확정되지 않았습니다. SignPath Foundation OSS signing은 신청해 둔 상태이며, 필요하면
-상용 OV 인증서나 다른 서명 경로를 검토할 수 있습니다. macOS signing/notarization 및 clean-machine
-smoke test는 별도로 검증 중입니다. 이 경로가 준비되기 전까지는 npm 설치 경로를 기준으로 문서화합니다.
+Framein은 현재 npm 경로로 Windows, macOS, Linux, WSL에서 사용할 수 있습니다. 이 경로에서 필요한
+런타임은 Node.js 22.5+입니다.
+
+Standalone 실행 파일은 npm을 대체하는 경로가 아니라 추가 편의 경로로 준비 중입니다. 주된 장점은 다음과
+같습니다.
+
+- 사용자가 Node/npm을 별도로 설치하지 않아도 됩니다.
+- Windows에서 npm이 생성하는 `.ps1` shim과 PowerShell 실행정책 마찰을 피할 수 있습니다.
+- 향후 `winget`, `scoop`, Homebrew 같은 배포 경로가 release asset을 가리킬 수 있습니다.
+
+계획 중인 실행 파일 형태는 Node 런타임과 Framein 코드를 하나의 실행 파일에 함께 담는 방식입니다. 사용자
+시스템에 Node를 전역 설치하거나 기존 Node 설치를 변경하지 않습니다.
+
+`v0.0.4`에는 공식 standalone `.exe`, `.pkg`, `.dmg`, Linux binary package, `winget`, `scoop`,
+Chocolatey 설치 경로가 없습니다. 직접 빌드한 실행 파일, 미서명 실행 파일, test-signed artifact를 공식
+릴리스로 취급하지 마세요. 향후 Windows 경로는 `framein-win-x64.exe` 같은 GitHub Release asset,
+`SHA256SUMS.txt`, 서명 확인 방법, signed/unsigned 상태를 명확히 적은 릴리스 노트와 함께 문서화할
+예정입니다.
+
+Windows Authenticode 서명 경로는 아직 확정되지 않았습니다. SignPath Foundation OSS signing은 신청해 둔
+상태이며, 필요하면 상용 OV 인증서나 다른 서명 경로를 검토할 수 있습니다. macOS signing/notarization 및
+clean-machine smoke test는 별도로 검증 중입니다. 이 경로가 준비되기 전까지는 npm 설치 경로를 기준으로
+문서화합니다.
 
 ## 7. 설치 확인
 
