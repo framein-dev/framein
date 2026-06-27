@@ -1,14 +1,9 @@
-<table>
-  <tr>
-    <td width="170" valign="middle">
-      <img src="docs/assets/framein-bi.png" alt="Framein" width="150">
-    </td>
-    <td valign="middle">
-      <strong>One local work frame beneath the coding agents you already use.</strong><br>
-      Start with one agent. Challenge with another. Switch when needed. Ship with evidence.
-    </td>
-  </tr>
-</table>
+<p>
+  <img src="docs/assets/framein-bi.png" alt="Framein" width="150" align="left">
+  <strong>One local work frame beneath the coding agents you already use.</strong><br>
+  Start with one agent. Challenge with another. Switch when needed. Ship with evidence.
+</p>
+<br clear="left">
 
 <p align="center">
   <a href="https://www.npmjs.com/package/framein"><img src="https://img.shields.io/npm/v/framein" alt="npm version"></a>
@@ -27,16 +22,6 @@
   <a href="SECURITY.md">Security</a>
 </p>
 
-<p align="center">
-  <a href="https://www.framein.dev/#demo">
-    <img src="docs/assets/framein-demo-storyboard.gif" alt="Framein demo: challenge and handoff across AI coding agents" width="760">
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://www.framein.dev/#demo">Watch the full demo</a>
-</p>
-
 Framein is a local work-state layer beneath the coding agents and harnesses you already use. Keep
 using Claude Code, Codex, Gemini, Pi, OpenCode, slash-command frameworks, skill packs, role-based
 workflows, or your own setup. Framein keeps the work underneath them stable: a task contract,
@@ -51,6 +36,13 @@ Status: **public pre-release** (`v0.0.5`). Runtime dependencies: **zero**. Requi
 
 Links:
 - Korean: [웹사이트](https://www.framein.dev/ko) | [개발자 노트](https://www.framein.dev/ko/why) | [매뉴얼](docs/MANUAL.ko.md) | [설치 가이드](docs/INSTALL.ko.md)
+
+## Demo
+
+[![Framein demo: challenge and handoff across AI coding agents](docs/assets/framein-demo-storyboard.gif)](https://www.framein.dev/#demo)
+
+Challenge a plan with another model, then hand off the task without losing the local facts.
+[Watch the full 30-second demo](https://www.framein.dev/#demo).
 
 ## Why Framein?
 
