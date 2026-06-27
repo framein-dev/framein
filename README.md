@@ -35,6 +35,9 @@ The pain Framein targets starts when the work has to survive beyond one model or
 Framein does not replace the coding agent or pretend to be a full multi-agent cockpit. It keeps one
 local work frame under the agents you already use.
 
+For the longer origin story and design notes, see
+[Why I built Framein](https://www.framein.dev/why).
+
 ## Quick Start
 
 npm is now the default public install path:
