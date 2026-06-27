@@ -19,6 +19,13 @@ Status: **public pre-release** (`v0.0.4`). Runtime dependencies: **zero**. Requi
 
 [Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Security](SECURITY.md)
 
+## Demo
+
+[![Framein demo: challenge and handoff across AI coding agents](docs/assets/framein-demo-storyboard.gif)](https://www.framein.dev/#demo)
+
+Challenge a plan with another model, then hand off the task without losing the local facts.
+[Watch the full 30-second demo](https://youtu.be/8dySQUOrrbk).
+
 ## Why Framein?
 
 Good PRDs, plans, ADRs, and skill packs help any model do better work. That is useful, and Framein is
