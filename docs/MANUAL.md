@@ -164,24 +164,21 @@ same repo-local store and ledger.
 
 ### 4.2 Install
 
-Public npm is not live yet. Install the latest standalone binary from GitHub Releases:
-
-Windows PowerShell:
-
-```powershell
-irm https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.ps1 | iex
-```
-
-macOS / Linux:
+Install from npm:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.sh | sh
-```
-
-Then verify:
-
-```bash
+npm install -g framein
 framein --version
+```
+
+For local checkout testing:
+
+```bash
+git clone https://github.com/framein-dev/framein.git
+cd framein
+npm install
+npm run build
+npm install -g .
 ```
 
 ### 4.3 Build from source

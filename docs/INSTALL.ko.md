@@ -1,64 +1,113 @@
 # Framein 설치 가이드
 
-Framein은 아직 pre-release입니다. 공개 npm 배포 전까지는 GitHub Release의 standalone binary를 기본 설치 경로로 사용합니다.
+Framein은 현재 public pre-release입니다. 기본 공개 설치 경로는 npm입니다.
 
 English guide: [INSTALL.md](INSTALL.md)
 
-## 0. 요구사항
+Code signing policy: [CODE_SIGNING.md](CODE_SIGNING.md)
 
-- **지원 OS:** Windows x64, macOS arm64/x64, Linux x64
-- **Node.js 22.5.0 이상:** 소스에서 빌드하거나 npm 패키지 경로를 사용할 때만 필요
-- 선택 사항: 실제 에이전트 연동을 위해 `claude`, `codex`, `gemini` CLI가 `PATH`에 설치되어 있으면 좋습니다.
+## 0. 사전 준비
 
-standalone binary는 Node SEA로 빌드되므로 일반 사용에는 별도 Node 설치가 필요하지 않습니다.
+- **Node.js 22.5.0 이상.** Framein은 Node 내장 experimental `node:sqlite` 모듈을 사용합니다.
+- 선택: 실제 에이전트 연동에는 `claude`, `codex`, `gemini` CLI가 PATH에 있어야 합니다.
 
-## 1. Windows
+먼저 Node 버전을 확인하세요.
 
-PowerShell:
+```bash
+node --version
+```
+
+`v22.5.0`보다 낮으면 `nvm`, `fnm`, Homebrew, Volta, 공식 설치본 등으로 Node를 올린 뒤 진행하세요.
+오래된 Node에서는 설치가 되더라도 실행 시 `node:sqlite` 로딩에서 실패할 수 있습니다.
+
+## 1. npm 설치
+
+```bash
+npm install -g framein
+framein --version
+```
+
+예상 결과:
+
+```text
+framein 0.0.4
+```
+
+전역 설치 제거:
+
+```bash
+npm rm -g framein
+```
+
+## 2. 환경별 메모
+
+| 환경 | 권장 명령 | 주의 |
+|---|---|---|
+| Windows PowerShell | `npm.cmd install -g framein` | PowerShell `.ps1` 실행정책 마찰을 피합니다. |
+| Windows cmd.exe | `npm install -g framein` | 보통 별도 정책 변경 없이 동작합니다. |
+| Windows Git Bash | `npm install -g framein` | PowerShell shim을 쓰지 않습니다. |
+| macOS zsh/bash | `npm install -g framein` | 전역 npm 권한 오류가 나면 Node 버전 매니저를 권장합니다. |
+| Linux | `npm install -g framein` | distro Node가 오래된 경우가 많으므로 `nvm`, `fnm`, Volta를 권장합니다. |
+| WSL | WSL 내부 Node/npm으로 설치 | Windows `.cmd` 또는 `.exe` shim은 WSL 설치를 대신하지 않습니다. |
+
+## 3. 문제 해결
+
+### Windows PowerShell에서 `npm.ps1` 또는 `framein.ps1`이 차단됨
+
+PowerShell 실행정책 문제이며 Framein 런타임 오류가 아닙니다.
+
+정책을 바꾸기 싫으면 `.cmd`를 사용하세요.
 
 ```powershell
-irm https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.ps1 | iex
-framein --version
+npm.cmd install -g framein
+framein.cmd --version
 ```
 
-설치 스크립트는 최신 GitHub Release에서 `framein-win-x64.exe`를 내려받고, `SHA256SUMS.txt`가 있으면 체크섬을 검증한 뒤 사용자
-프로필 아래에 설치하고 사용자 PATH에 추가합니다. 바로 `framein`을 찾지 못하면 새 터미널을 열어 주세요.
+또는 사용자 범위에서 로컬 스크립트를 허용할 수 있습니다.
 
-수동 설치:
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
 
-1. 최신 GitHub Release에서 `framein-win-x64.exe`를 다운로드합니다.
-2. 사용자 PATH에 포함된 폴더에 둡니다.
-3. 필요하면 파일명을 `framein.exe`로 맞춥니다.
-4. `framein --version`을 실행합니다.
+Git Bash와 `cmd.exe`도 PowerShell `.ps1` shim을 피합니다.
 
-## 2. macOS / Linux
+### macOS/Linux에서 `EACCES: permission denied`
+
+전역 npm prefix가 시스템 소유일 가능성이 큽니다.
+
+권장: `nvm`, `fnm`, Volta 또는 macOS Homebrew Node처럼 사용자 소유 Node를 사용한 뒤 다시 설치합니다.
+
+임시 우회:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.sh | sh
-framein --version
+sudo npm install -g framein
 ```
 
-설치 스크립트는 OS와 아키텍처에 맞는 release asset을 선택합니다.
+### 설치 후 `framein: command not found`
 
-- `framein-macos-arm64`
-- `framein-macos-x64`
-- `framein-linux-x64`
-
-기본 설치 위치는 `~/.local/bin`입니다. 다른 위치를 쓰려면:
+npm 전역 bin 디렉터리가 PATH에 없을 수 있습니다.
 
 ```bash
-FRAMEIN_BIN=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.sh | sh
+npm prefix -g
 ```
 
-셸에서 `framein`을 찾지 못하면 설치 위치를 `PATH`에 추가합니다.
+해당 prefix의 `bin` 디렉터리를 셸 프로필에 추가하고 터미널을 다시 여세요.
+
+### WSL에서 Windows 설치본이 보이지 않음
+
+WSL은 Windows와 분리된 Linux 환경입니다. WSL 내부에 Node 22.5+와 Framein을 별도로 설치하세요.
 
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
+node --version
+npm install -g framein
 ```
 
-## 3. 프로젝트에서 처음 실행
+`/go`나 live delegation을 WSL에서 쓸 경우, 대상 에이전트 CLI(`claude`, `codex`, `gemini`)도 WSL
+안에 설치되어 있어야 합니다.
 
-Framein을 적용할 실제 프로젝트 폴더에서 실행합니다.
+## 4. 프로젝트 초기화
+
+Framein을 사용할 프로젝트에서 실행합니다.
 
 ```bash
 cd your-project
@@ -67,10 +116,10 @@ framein integrations install all --write
 framein status
 ```
 
-이 명령은 Framein 로컬 store를 만들고, 지원되는 에이전트용 namespaced wrapper를 설치합니다. 생성된 wrapper는 로컬
-`framein` CLI를 호출할 뿐, 자격증명을 중계하거나 모델 트래픽을 프록시하지 않습니다.
+이 명령은 로컬 store를 만들고 지원되는 에이전트 wrapper를 설치합니다. 생성된 wrapper는 로컬 `framein`
+CLI를 호출할 뿐, 자격증명을 릴레이하거나 모델 트래픽을 프록시하지 않습니다.
 
-## 4. 소스에서 빌드
+## 5. 소스에서 빌드
 
 Framein 자체를 개발하거나 로컬 checkout을 테스트할 때 사용합니다.
 
@@ -80,42 +129,30 @@ cd framein
 npm install
 npm run build
 npm test
-npm link
+npm install -g .
 framein --version
 ```
 
-소스 빌드는 Node 내장 experimental `node:sqlite`를 사용하므로 Node.js 22.5.0 이상이 필요합니다.
+## 6. standalone binary 상태
 
-## 5. 문제 해결
+Windows/macOS/Linux standalone binary는 아직 기본 공개 설치 경로가 아닙니다. Windows Authenticode
+서명 경로는 아직 확정되지 않았습니다. SignPath Foundation OSS signing은 신청해 둔 상태이며, 필요하면
+상용 OV 인증서나 다른 서명 경로를 검토할 수 있습니다. macOS signing/notarization 및 clean-machine
+smoke test는 별도로 검증 중입니다. 이 경로가 준비되기 전까지는 npm 설치 경로를 기준으로 문서화합니다.
 
-### Windows에서 `.ps1` 실행이 막힘
-
-권장 명령은 설치 스크립트를 `iex`로 파이프합니다. PowerShell 실행 정책은 디스크에 저장된 `.ps1` 파일을 막는 경우가 많고,
-파이프된 표현식은 통과하는 경우가 많습니다. 조직 정책상 `iex`가 막혀 있다면 GitHub Release에서 `.exe`를 직접 다운로드하세요.
-
-### macOS에서 확인되지 않은 개발자 경고가 뜸
-
-macOS 서명/공증 release path는 아직 준비 중입니다. 그 전까지는 다운로드한 pre-release binary에서 Gatekeeper 경고가 뜰 수
-있습니다. 원하지 않으면 소스 빌드 경로를 사용하세요.
-
-### 아직 release asset이 없음
-
-Framein은 pre-release입니다. 최신 GitHub Release에 현재 플랫폼용 binary가 없다면 [소스에서 빌드](#4-소스에서-빌드)를 사용하세요.
-
-### `framein: command not found`
-
-설치 위치가 `PATH`에 없을 가능성이 큽니다. 설치 후 새 터미널을 열거나 설치 폴더를 직접 `PATH`에 추가하세요.
-
-### 에이전트 명령이 보이지 않음
-
-대상 프로젝트 안에서 wrapper를 설치하고 진단합니다.
+## 7. 설치 확인
 
 ```bash
-framein integrations install all --write
-framein doctor
+framein --version
+framein
 ```
 
-### WSL에서 Windows 설치본이 보이지 않음
+대화형 터미널에서는 bare `framein` 명령이 lobby를 엽니다. 비대화형 환경에서는 help를 출력하고 안전하게
+종료합니다.
 
-WSL은 별도 Linux 환경입니다. WSL 내부에 Linux binary를 설치하거나 소스에서 빌드하세요. WSL에서 live delegation을 쓸 경우
-`claude`, `codex`, `gemini` CLI도 WSL 내부에 설치되어 있어야 합니다.
+문제 보고 시 아래 정보를 함께 보내 주세요.
+
+- OS와 셸
+- `node --version`
+- 정확한 설치 명령
+- 정확한 오류 메시지

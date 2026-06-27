@@ -1,8 +1,8 @@
 # Code signing policy
 
-Framein is preparing signed executable releases for Windows and macOS. This policy describes the
-Windows code-signing process used for public release builds and the temporary test-signing process
-used while the project is pre-release.
+Framein is preparing signed executable releases for Windows and macOS. This policy records the
+intended trust boundary for release signing and the temporary test-signing process used while the
+project is pre-release. Standalone binaries are not the primary public install path yet; npm is.
 
 ## Current status
 
@@ -12,15 +12,13 @@ used while the project is pre-release.
 - Build system: GitHub Actions
 - Windows artifact: `framein-win-x64.exe`
 
-Framein has verified the SignPath signing workflow with a self-signed test certificate. Test-signed
+Framein has verified a Windows signing workflow with a self-signed test certificate. Test-signed
 artifacts are not public release artifacts and are not intended for end users.
 
-Public Windows release builds are intended to use:
-
-> Free code signing provided by SignPath.io, certificate by SignPath Foundation.
-
-This statement applies to public release artifacts only after SignPath Foundation OSS signing has
-been approved and connected to the release workflow.
+The Windows Authenticode signing path is not finalized. SignPath Foundation OSS signing has been
+requested, and commercial OV or another suitable signing route may be used if that is the practical
+path. Until release signing is finalized, standalone executable downloads are not documented as the
+default install method.
 
 ## What may be signed
 
@@ -46,7 +44,7 @@ The expected release path is:
 
 1. A version tag matching `v*` is pushed to the public repository.
 2. `.github/workflows/release.yml` builds the platform artifacts on GitHub-hosted runners.
-3. The Windows artifact is submitted to SignPath for Authenticode signing.
+3. The Windows artifact is signed through the selected Authenticode signing route.
 4. The signed artifact and `SHA256SUMS.txt` are attached to the GitHub Release.
 
 ## Team roles
@@ -65,7 +63,8 @@ Current public organization membership can be reviewed at:
 As additional maintainers join, these roles should move to explicit GitHub teams and this policy
 should link to those teams.
 
-All maintainers involved in signing must use multi-factor authentication for GitHub and SignPath.
+All maintainers involved in signing must use multi-factor authentication for GitHub and any signing
+provider involved in the release process.
 
 ## Privacy policy
 

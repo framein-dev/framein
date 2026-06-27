@@ -142,7 +142,7 @@
         </div>
         <div class="status-strip" aria-label="프로젝트 상태">
           <span class="pill">pre-release v0.0.4</span>
-          <span class="pill">243 tests</span>
+          <span class="pill">244 tests</span>
           <span class="pill">런타임 의존성 0</span>
           <span class="pill">Node 22.5+</span>
         </div>
@@ -224,9 +224,9 @@ risk <span class="warn">high: auth/ touched</span>
       <div>
         <div class="eyebrow">실제 저장소에서 시작</div>
         <h2 class="headline-lines"><span>설치해 두면, 모델을 오가도</span><span>같은 작업 프레임을 씁니다.</span></h2>
-        <p class="muted">공개 npm 릴리스 전까지는 GitHub Release 설치 스크립트를 사용합니다. 아래는 수동으로 확인하는 가장 작은 흐름입니다. 실제 사용에서는 에이전트가 <code>/fr:*</code> 또는 <code>$fr-*</code>로 같은 작업 프레임 동사를 호출할 수 있습니다.</p>
+        <p class="muted">npm으로 설치한 뒤 실제 프로젝트 안에서 Framein을 초기화합니다. 실제 사용에서는 에이전트가 <code>/fr:*</code> 또는 <code>$fr-*</code>로 같은 작업 프레임 동사를 호출할 수 있습니다.</p>
       </div>
-      <pre><code>curl -fsSL https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.sh | sh
+      <pre><code>npm install -g framein
 framein --version
 
 cd your-project

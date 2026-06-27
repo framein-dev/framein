@@ -151,7 +151,7 @@
         </div>
         <div class="status-strip" aria-label="Project status">
           <span class="pill">pre-release v0.0.4</span>
-          <span class="pill">243 tests</span>
+          <span class="pill">244 tests</span>
           <span class="pill">zero runtime dependencies</span>
           <span class="pill">Node 22.5+</span>
         </div>
@@ -233,9 +233,9 @@ risk <span class="warn">high: auth/ touched</span>
       <div>
         <div class="eyebrow">Start in a real repo</div>
         <h2 class="headline-lines"><span>Install once.</span><span>Keep the frame under your agents.</span></h2>
-        <p class="muted">Public npm is not live yet. The commands below use the GitHub Release installer; in day-to-day use, agents can call the same work-frame verbs through <code>/fr:*</code> or <code>$fr-*</code>.</p>
+        <p class="muted">Install from npm, then initialize Framein inside a real project. In day-to-day use, agents can call the same work-frame verbs through <code>/fr:*</code> or <code>$fr-*</code>.</p>
       </div>
-      <pre><code>curl -fsSL https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.sh | sh
+      <pre><code>npm install -g framein
 framein --version
 
 cd your-project
@@ -267,10 +267,6 @@ framein ship</code></pre>
         <div class="card">
           <h3>No proxy layer</h3>
           <p class="muted small">Framein does not collect provider credentials, pool subscriptions, relay MCP tools, or screen-scrape terminal I/O (TTY). It calls official CLIs locally when you ask it to.</p>
-        </div>
-        <div class="card">
-          <h3>Code signing policy</h3>
-          <p class="muted small">Windows release signing is being prepared through SignPath Foundation OSS signing. The public policy defines roles, privacy, uninstall, and verification details.</p>
         </div>
       </div>
     </div>

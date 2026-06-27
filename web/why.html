@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why I built Framein - Developer note</title>
+<meta name="description" content="A developer note on why Framein exists: one local work frame across Claude, Codex, and Gemini.">
+<meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large">
+<meta name="author" content="Frameout">
+<meta name="theme-color" content="#f6f6f1">
+<link rel="icon" href="/assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="canonical" href="https://www.framein.dev/why">
+<link rel="alternate" hreflang="en" href="https://www.framein.dev/why">
+<link rel="alternate" hreflang="ko" href="https://www.framein.dev/ko/why">
+<link rel="alternate" hreflang="x-default" href="https://www.framein.dev/why">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Why I built Framein">
+<meta property="og:description" content="One local work frame across Claude, Codex, and Gemini.">
+<meta property="og:url" content="https://www.framein.dev/why">
+<meta property="og:site_name" content="Framein">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ko_KR">
+<meta property="og:image" content="https://www.framein.dev/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why I built Framein">
+<meta name="twitter:description" content="One local work frame across Claude, Codex, and Gemini.">
+<meta name="twitter:image" content="https://www.framein.dev/assets/og-image.png">
+<style>
+  :root{--bg:#f6f6f1;--panel:#fff;--ink:#202124;--muted:#5f6268;--line:#d7d7cf;--brand:#476900;--soft:#e7e7df;--code:#0d0f11;--codeText:#ecefe7}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.72;-webkit-font-smoothing:antialiased}
+  a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:20;background:rgba(246,246,241,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+  .nav{min-height:64px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+  .brand{display:inline-flex;align-items:center;text-decoration:none}.brand:hover{text-decoration:none}.brand-logo{display:block;width:118px;height:auto}
+  nav{display:flex;gap:18px;align-items:center;flex-wrap:wrap;justify-content:flex-end}nav a{font-size:14px;color:var(--muted)}nav a.primary{color:var(--brand);font-weight:750}
+  main{padding:70px 0 80px}
+  article{max-width:820px;margin:0 auto}
+  .eyebrow{color:var(--brand);font-size:12px;font-weight:850;letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px}
+  h1{font-size:clamp(38px,5vw,64px);line-height:1.04;margin:0 0 16px;letter-spacing:0}
+  h2{font-size:clamp(24px,3vw,34px);line-height:1.18;margin:52px 0 16px;letter-spacing:0}
+  p{margin:0 0 18px;text-wrap:pretty}
+  ul{margin:0 0 24px;padding-left:24px}
+  li{margin:8px 0}
+  .dek{font-size:21px;color:#37393d;margin-bottom:34px}
+  hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+  strong{font-weight:800}
+  em{color:#34373a}
+  pre{margin:20px 0 24px;background:var(--code);color:var(--codeText);border-radius:8px;border:1px solid #1d2224;padding:18px;overflow:auto;font-size:13px;line-height:1.62}
+  code{font-family:"Geist Mono","JetBrains Mono","Cascadia Mono",Consolas,monospace}
+  :not(pre)>code{font-size:.9em;background:var(--soft);border:1px solid var(--line);border-radius:5px;padding:.08em .35em}
+  .note{border-left:4px solid var(--brand);padding:10px 0 10px 16px;color:#34373a;background:linear-gradient(90deg,rgba(71,105,0,.08),transparent)}
+  .signature{margin-top:34px;color:var(--muted)}
+  footer{border-top:1px solid var(--line);padding:30px 0 54px;color:var(--muted);font-size:13px}.footer-inner{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap}.footer-brand{display:inline-flex;align-items:flex-end;gap:8px;color:var(--ink);text-decoration:none}.footer-brand:hover{text-decoration:none}.footer-logo{display:block;width:88px;height:auto}.footer-brand span{color:var(--muted);font-weight:500;font-size:11px;line-height:1;margin-bottom:7px}.footer-sep{color:var(--line)}
+  @media(max-width:640px){.wrap{padding:0 18px}.nav{min-height:64px;align-items:center;padding:18px 24px 14px;gap:14px}.brand-logo{width:98px}nav{gap:14px}main{padding:48px 0 60px}h1{font-size:36px}h2{font-size:28px;margin-top:42px}.dek{font-size:18px}pre{font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}.footer-logo{width:76px}.footer-brand span{font-size:10px;margin-bottom:6px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/" aria-label="framein home"><img class="brand-logo" src="/assets/framein-bi.png" alt="framein"></a>
+    <nav aria-label="Main navigation">
+      <a class="primary" href="https://github.com/framein-dev/framein">GitHub</a>
+      <a href="/ko/why">KO</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <article class="wrap">
+    <div class="eyebrow">Developer note</div>
+    <h1>Why I built Framein</h1>
+    <p class="dek"><em>One local work frame across Claude, Codex, and Gemini.</em></p>
+    <hr>
+
+    <h2>The mess that started it</h2>
+    <p>I do most of my coding through terminal agents now — Claude Code, Codex, and Gemini CLI, side by side in VS Code. Not because I'm chasing some "multi-agent" dream. It's more boring than that:</p>
+    <ul>
+      <li>Claude is my default for implementation.</li>
+      <li>When something needs an outside opinion — a security hole, a regression, a plan that smells off — Codex catches things Claude doesn't.</li>
+      <li>Gemini explains the result more clearly when I need to hand it to someone else.</li>
+      <li>And honestly, sometimes I just hit a usage limit on one and switch to keep working.</li>
+    </ul>
+    <p>So I had three terminals open, and I was the integration layer between them. Every switch meant re-explaining the same thing: here's the goal, here's what we must not break, here's what the last model already tried and why it failed. I was copy-pasting chat summaries between models like a human clipboard.</p>
+    <p>The worst part wasn't the typing. It was that <strong>the work kept dying at the boundary.</strong> The moment I switched models, the context — the actual contract, the failed attempts, the decisions, the validation state — was gone. Each model started clean and confident, and I started over.</p>
+    <p>Switching wasn't the only problem. Sometimes one model kept circling the same solution. On work like a checkout webhook, where retries and idempotency matter, a confident "done" could still feel unsafe. What I needed in that moment was not always a new lead model. I needed another model to read the same task contract, diff, and validation state, then ask: what risk is this plan missing?</p>
+    <p>That is where <code>challenge</code> came from. Instead of opening a fresh chat and re-explaining the project, Framein asks another model for a bounded audit from the facts already recorded. It is less about replacing the stuck model, and more about giving it a second set of eyes while the work is still alive.</p>
+
+    <h2>I almost didn't build it</h2>
+    <p>When I finally sat down to design this, I did what you're supposed to do: I checked if it already existed. It did. A lot.</p>
+    <p>CCB, Claude Squad, CC Switch, SuperClaude and its growing family, gstack, Matt Pocock's skill packs — the space was crowded. My first reaction was relief turning into deflation: <em>lots of people clearly felt this exact pain, and several had already shipped.</em> The honest read was that a generic "multi-CLI manager" would just get the comment every one of these gets: <strong>"How is this different from CCB?"</strong></p>
+    <p>That question turned out to be the most useful thing that happened. Because once I stopped trying to build a CLI manager, I could see what was actually missing.</p>
+
+    <h2>The insight: don't build a better handoff. Delete the handoff.</h2>
+    <p>Every existing tool I looked at — and my own first design — solved the switching problem by making a better <strong>handoff package</strong>: bundle up a summary, a diff, the test results, and pass it to the next model. I was about to build the same thing.</p>
+    <p>Then it clicked that the handoff itself was the bug.</p>
+    <p>If three agents read from <strong>one shared source of truth</strong> — the task contract, the decision trail (ADRs), the validation results, the risk state — then "handing off" isn't a step anymore. The next model doesn't get my summary of the facts. It reads the facts. Nobody has to remember to pass anything, because nothing was ever separated.</p>
+    <p>That reframing is the whole product. Framein isn't a cockpit that runs three agents in a grid. It's a thin local layer that keeps <strong>one work frame</strong> under whatever agent you're already using, so the work survives longer than any single model or session.</p>
+
+    <h2>What it actually does</h2>
+    <p>The loop is four verbs:</p>
+    <pre><code>start     -> turn the request into a task contract before the work drifts
+challenge -> ask another model to audit a stuck plan or risky change
+capsule   -> prepare the next lead from facts: contract, diff, validation, ADRs, ledger
+ship      -> close with real build/test/risk gates, not the model saying "done"</code></pre>
+    <p>You call them from the terminal, or as <code>/fr:*</code> slash commands inside Claude/Gemini, or as <code>$fr-*</code> skills in Codex. Same engine underneath, same local state. Your existing skill packs and personas stay exactly as they are — Framein just supplies the contract, ledger, and gates beneath them.</p>
+
+    <h2>The decisions I'm most sure about</h2>
+    <p><strong>Compliance-first, or don't ship at all.</strong> Early in 2026 Anthropic clarified its terms and started blocking third-party tools that routed subscription traffic or pooled credentials. That isn't a hoop to jump through; it's a design boundary I agree with. So Framein collects no credentials, relays no tokens, pools no subscriptions, and never screen-scrapes terminal I/O. It calls the official CLIs locally when you ask it to, and they keep their own auth. The README's trust boundary isn't marketing — it's the line that decides whether a tool like this deserves to exist.</p>
+    <p><strong>Decisions are append-only.</strong> ADRs can't be edited or deleted, only superseded. A decision trail you can quietly rewrite is worthless the moment a second model — or a second person — relies on it.</p>
+    <p><strong>Zero runtime dependencies.</strong> The whole thing runs on Node 22's built-in <code>node:sqlite</code> and built-in test runner. No native builds, no dependency churn to break installs six months from now. The store is a local SQLite cache; the canonical snapshot is git-friendly JSON.</p>
+    <p><strong>One writer at a time.</strong> The hard problem in shared agent memory isn't sharing — it's two agents writing inconsistent facts about the same thing. I started with the boring, safe answer: an atomic write lock with a TTL. Correctness before cleverness.</p>
+
+    <h2>Where it is now</h2>
+    <p>Pre-release, <code>v0.0.4</code>. The core — store, managed-block projection across CLAUDE.md / AGENTS.md / GEMINI.md, the task contract, the verify/risk/ship gates, the <code>/fr:*</code> and <code>$fr-*</code> wrappers, and the MCP server — is implemented and covered by 240+ tests.</p>
+    <p>The public npm package is live as <code>framein@0.0.4</code>. Still being hardened: the Windows Authenticode path, signed/notarized executable releases, clean-machine install checks, and multi-developer workflows.</p>
+    <p class="note">I'm not claiming it'll change how you work. I built it because three terminals and a human clipboard was a bad way to spend my days, and the fix turned out to be small and local rather than big and clever. If you live in more than one coding agent, I'd like to know whether it helps you too.</p>
+    <p>It's MIT, built at <a href="https://frameout.co.kr">Frameout</a>. The name is a film term: <em>frameout</em> is when a subject leaves the frame and lives only in the imagined off-screen space. <em>Framein</em> is bringing it back in — pulling three scattered agents into one frame you can actually see.</p>
+
+    <p class="signature">— Ku Jaho, AX Center, Frameout<br>— <em>Repo and docs: <a href="https://www.framein.dev">framein.dev</a></em></p>
+  </article>
+</main>
+<footer>
+  <div class="wrap footer-inner"><a class="footer-brand" href="/" aria-label="framein home"><img class="footer-logo" src="/assets/framein-bi.png" alt="framein"><span>by Frameout</span></a><span class="footer-sep">·</span><span>MIT</span><span class="footer-sep">·</span><a href="https://github.com/framein-dev/framein">GitHub</a><span class="footer-sep">·</span><a href="https://frameout.co.kr">frameout.co.kr</a><span class="footer-sep">·</span><a href="mailto:axc@frameout.co.kr">axc@frameout.co.kr</a></div>
+</footer>
+</body>
+</html>

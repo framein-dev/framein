@@ -35,8 +35,8 @@ Framein is local-first. It does not collect provider credentials, pool subscript
 
 ## Code Signing Policy
 
-Windows release signing is being prepared through SignPath Foundation OSS signing. The public policy covers signing roles, privacy, uninstall, and verification: https://github.com/framein-dev/framein/blob/main/docs/CODE_SIGNING.md
+Windows release signing is still being finalized. SignPath Foundation OSS has been requested, and commercial OV or another Authenticode route may be used if that is the practical path. The public policy covers signing roles, privacy, uninstall, and verification: https://github.com/framein-dev/framein/blob/main/docs/CODE_SIGNING.md
 
 ## Current Status
 
-Framein is pre-release. Public executable distribution is not yet marked ready until CI artifacts, signing, notarization, and smoke tests are complete.
+Framein is public pre-release. The npm package is published as framein@0.0.4. Standalone executable distribution is not marked ready until signing, notarization, and smoke tests are complete.

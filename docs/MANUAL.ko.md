@@ -119,17 +119,25 @@ Framein은 단일 진실원천(`.frame` 스토어) 위에 **로컬 증거 게이
 
 ### 4.1 요구사항
 - **Node.js ≥ 22.5.0** (필수 — 내장 `node:sqlite` 사용). 확인: `node --version`
-- **런타임 의존성 0개.** `npm install`로 받는 것은 빌드 도구(`typescript`, `@types/node`)뿐.
+- **런타임 의존성 0개.** 소스 checkout에서 `npm install`로 받는 것은 빌드 도구(`typescript`, `@types/node`)뿐입니다.
 - 실 에이전트 연동(§8)을 쓰려면 해당 CLI 설치: `claude` / `codex` / `gemini`(+ API key).
 
-### 4.2 빌드 & 검증
+### 4.2 설치
 ```bash
-npm install      # 개발 도구
-npm run build    # tsc → dist/
-npm test         # 빌드 + 전체 테스트 (176개) — pass 176 / fail 0 이면 정상
+npm install -g framein
+framein --version
 ```
 
-### 4.3 실행 방법 (바이너리: `framein` · 별칭 `fr` / `frame`)
+### 4.3 로컬 checkout 빌드 & 검증
+```bash
+git clone https://github.com/framein-dev/framein.git
+cd framein
+npm install      # 개발 도구
+npm run build    # tsc → dist/
+npm test         # 빌드 + 전체 테스트 (244개) — pass 244 / fail 0 이면 정상
+```
+
+### 4.4 로컬 개발 실행 방법 (바이너리: `framein` · 별칭 `fr` / `frame`)
 ```bash
 node dist/cli.js <명령>          # A) 직접 (빌드만 한 상태)
 npm run framein -- <명령>        # B) npm 스크립트 ( -- 뒤에 인자 )
@@ -491,7 +499,7 @@ managed-block 본문 구조(예):
 
 ## 12. 현재 상태 (정직 고지)
 
-**구현·테스트 완료 (176 tests, green, zero runtime dep):**
+**구현·테스트 완료 (244 tests, green, zero runtime dep):**
 - 코어(스토어·투영·managed-block·원자적 다중프로세스 락·텍스트 직렬화·역할 라우팅·ADR).
 - MCP/스킬 감지·등록, 스펙 준수 MCP 서버(initialize 네고·ping·inputSchema·isError, ADR-0007).
 - **제품 루프 P0~P2 전부:** Task Contract · Evidence Gate · Rescue · Capsule · Disagreement ·
@@ -541,7 +549,7 @@ OSS 릴리스 준비(LICENSE/CI/SECURITY 등).
 |---|---|
 | `No .frame/store.db found. Run 'framein init' first.` | 해당 폴더에서 `framein init` 먼저. |
 | `node:sqlite` 오류 / 모듈 없음 | Node < 22.5. `node --version` 확인. |
-| `frame` 명령 못 찾음 | `npm run build` 후 `node dist/cli.js …` 또는 `npm link`. |
+| `framein` 또는 `frame` 명령 못 찾음 | npm 설치본은 `npm install -g framein`. 로컬 checkout은 `npm run build` 후 `node dist/cli.js …` 또는 `npm link`. |
 | `ask --run`이 `'codex' not found` | 해당 CLI 미설치(또는 PATH 밖). 설치하거나 `--show`로 명령만 확인. |
 | MCP 도구 호출이 `user cancelled` | 도구 호출엔 trust 필요 — `--trust`(claude) / codex `--full-auto` / gemini `--yolo`. |
 | 역할 set 했는데 안 바뀜 | agent 인자 누락 시 오류가 납니다. `framein role set <role> <agent>` 형식 확인. |
@@ -553,7 +561,7 @@ OSS 릴리스 준비(LICENSE/CI/SECURITY 등).
 
 ```bash
 npm run build      # tsc → dist/
-npm test           # 빌드 후 dist/**/*.test.js 전체 (176개)
+npm test           # 빌드 후 dist/**/*.test.js 전체 (244개)
 node --no-warnings --test dist/store.test.js                              # 한 파일
 node --no-warnings --test --test-name-pattern="supersede" dist/**/*.test.js   # 이름으로
 node --no-warnings dist/cli.js <cmd>                                      # 로컬 실행

@@ -14,7 +14,7 @@ a compact capsule the next model can read.
 start in Claude -> challenge with Codex -> switch when needed -> validate before ship
 ```
 
-Status: **pre-release** (`v0.0.4`). Runtime dependencies: **zero**. Required Node:
+Status: **public pre-release** (`v0.0.4`). Runtime dependencies: **zero**. Required Node:
 **22.5.0+**.
 
 [Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Security](SECURITY.md)
@@ -37,22 +37,21 @@ local work frame under the agents you already use.
 
 ## Quick Start
 
-Public npm is not live yet. Install the latest standalone binary from GitHub Releases:
-
-```powershell
-# Windows PowerShell
-irm https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.ps1 | iex
-```
+npm is now the default public install path:
 
 ```bash
-# macOS / Linux
-curl -fsSL https://raw.githubusercontent.com/framein-dev/framein/main/scripts/install.sh | sh
-```
-
-Then verify:
-
-```bash
+npm install -g framein
 framein --version
+```
+
+If you want to test a local checkout instead:
+
+```bash
+git clone https://github.com/framein-dev/framein.git
+cd framein
+npm install
+npm run build
+npm install -g .
 ```
 
 Initialize a project:
@@ -203,16 +202,13 @@ Solid in the current pre-release:
 - MCP stdio server and registration helpers
 - Headless delegation to real CLIs where available
 - Windows author environment live-verified
-- `243` automated tests passing
+- `244` automated tests passing
 
 Still being validated:
 
-- macOS/Linux install and runtime paths
-- signed executable release hardening for Windows and macOS
-- SignPath Foundation OSS code-signing approval and automated Windows release signing
+- signed standalone executable release hardening for Windows and macOS
 - multi-developer workflows
 - interactive lobby paths such as `/lead`, `/go`, and inline command palette
-- public npm release and signed executable distribution
 
 ## Development
 
