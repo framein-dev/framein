@@ -31,7 +31,7 @@ decision trail, risk state, validation results, and a compact capsule the next m
 start in Claude -> challenge with Codex -> switch when needed -> validate before ship
 ```
 
-Status: **public pre-release** (`v0.0.5`). Runtime dependencies: **zero**. Required Node:
+Status: **public pre-release** (`v0.0.6`). Runtime dependencies: **zero**. Required Node:
 **22.5.0+**.
 
 Links:

@@ -29,7 +29,7 @@ framein --version
 Expected result:
 
 ```text
-framein 0.0.5
+framein 0.0.6
 ```
 
 To remove the global install:
@@ -151,7 +151,7 @@ The planned executable form bundles the Node runtime with Framein's code. It doe
 globally or modify the user's system Node installation.
 
 There is no official standalone `.exe`, `.pkg`, `.dmg`, Linux binary package, `winget`, `scoop`, or
-Chocolatey install path for `v0.0.5`. Do not treat self-built, unsigned, or test-signed binaries as
+Chocolatey install path for `v0.0.6`. Do not treat self-built, unsigned, or test-signed binaries as
 official releases. The expected future Windows path is a GitHub Release asset such as
 `framein-win-x64.exe`, accompanied by `SHA256SUMS.txt`, signature verification instructions, and
 clear signed/unsigned release notes.

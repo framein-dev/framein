@@ -1336,7 +1336,7 @@ function cmdShell(): void {
     // below it and ERASES itself on choice (clearOnExit), so what remains is a single lobby screen —
     // not a stacked [pick]+[welcome] two-stage view.
     if (interactive) {
-      const ver = readVersion().replace(/^framein /, 'v'); // e.g. v0.0.5
+      const ver = readVersion().replace(/^framein /, 'v'); // e.g. v0.0.6
       console.log(renderFrame('FRAMEIN', [`Framein by Frameout · ${ver}`, 'Intent in · Validation in · Drift out'], { ui, unicode: caps.unicode, columns: caps.columns }));
       console.log('');
     }
