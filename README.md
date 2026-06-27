@@ -17,7 +17,7 @@ start in Claude -> challenge with Codex -> switch when needed -> validate before
 Status: **public pre-release** (`v0.0.4`). Runtime dependencies: **zero**. Required Node:
 **22.5.0+**.
 
-[Website](https://www.framein.dev) · [Manual](docs/MANUAL.md) · [FAQ](docs/FAQ.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Security](SECURITY.md)
+[Website](https://www.framein.dev) · [한국어](https://www.framein.dev/ko) · [Manual](docs/MANUAL.md) · [한국어 매뉴얼](docs/MANUAL.ko.md) · [FAQ](docs/FAQ.md) · [Install notes](docs/INSTALL.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Security](SECURITY.md)
 
 ## Demo
 
