@@ -16,6 +16,8 @@ function leadPosition(d) {
         const e = d.entries[i];
         if (e.kind === 'revision')
             return e.revision.text || d.topic;
+        if (e.kind === 'response')
+            return e.response.proposedRevision ?? e.response.text ?? d.topic;
         if (e.kind === 'proposal')
             return e.proposal.text;
     }
@@ -46,6 +48,11 @@ export function debateStatus(d) {
             return escalate();
         return { state: 'awaiting-revision', required: last.challenge.requiredChange };
     }
+    if (last.kind === 'response') {
+        if (rounds >= d.maxRounds)
+            return escalate();
+        return { state: 'awaiting-decision', required: reviewerRequirement(d) };
+    }
     // last is a revision
     if (last.revision.accepted)
         return { state: 'resolved', how: 'lead-accepted' };
@@ -63,6 +70,18 @@ export function renderDebate(d, ui = PLAIN) {
             lines.push(c.verdict === 'accept'
                 ? `challenge${c.by ? ` (${c.by})` : ''}: accept`
                 : `challenge${c.by ? ` (${c.by})` : ''}: ${c.claim ?? ''}${c.requiredChange ? ` → require: ${c.requiredChange}` : ''}`);
+            if (c.basis?.length)
+                lines.push(`  basis: ${c.basis.join(', ')}`);
+            if (c.missingEvidence?.length)
+                lines.push(`  missing_evidence: ${c.missingEvidence.join('; ')}`);
+        }
+        else if (e.kind === 'response') {
+            const r = e.response;
+            lines.push(`response${r.by ? ` (${r.by})` : ''}: ${r.text}`);
+            if (r.proposedRevision)
+                lines.push(`  proposed_revision: ${r.proposedRevision}`);
+            if (r.acceptsRequiredChange !== undefined)
+                lines.push(`  accepts_required_change: ${r.acceptsRequiredChange ? 'yes' : 'no'}`);
         }
         else {
             lines.push(`revision: ${e.revision.accepted ? 'accepted' : 'rejected'}${e.revision.text ? ` — ${e.revision.text}` : ''}`);
@@ -77,6 +96,8 @@ export function renderDebate(d, ui = PLAIN) {
         for (const o of st.options)
             lines.push(`  ${o}`);
     }
+    else if (st.state === 'awaiting-decision')
+        lines.push(ui.tone(`Awaiting lead decision${st.required ? ` (reviewer requires: ${st.required})` : ''}.`, 'info'));
     else if (st.state === 'awaiting-revision')
         lines.push(ui.tone(`Awaiting lead revision${st.required ? ` (required: ${st.required})` : ''}.`, 'info'));
     else

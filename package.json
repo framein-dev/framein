@@ -1,6 +1,6 @@
 {
   "name": "framein",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Local work-state layer beneath AI coding agents and harnesses.",
   "type": "module",
   "homepage": "https://www.framein.dev",

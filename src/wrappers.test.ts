@@ -16,7 +16,7 @@ test('wrapperFiles: namespaced paths + logic-less (calls <bin> <verb> --json) + 
   assert.match(gm.content, /!\{framein verify --json \{\{args\}\}\}/); // Gemini shell-injection form
   assert.ok(gm.content.includes(PROVENANCE));
 
-  const cx = wrapperFiles('codex').find((f) => f.path === '.codex/skills/fr-verify/SKILL.md')!;
+  const cx = wrapperFiles('codex').find((f) => f.path === '.agents/skills/fr-verify/SKILL.md')!;
   assert.ok(cx, 'codex verify is a SKILL.md skill (invoked as $fr-verify)');
   assert.match(cx.content, /framein verify --json/);
   assert.match(cx.content, /^name: fr-verify$/m); // skill name → $fr-verify
@@ -27,7 +27,7 @@ test('risk is wrapped → /fr:risk (Claude) · $fr-risk (Codex) — Blast Radius
   const cl = wrapperFiles('claude').find((f) => f.path === '.claude/commands/fr/risk.md');
   assert.ok(cl, 'claude /fr:risk wrapper exists');
   assert.match(cl!.content, /framein risk --json/); // risk emits structured output the agent ingests
-  const cx = wrapperFiles('codex').find((f) => f.path === '.codex/skills/fr-risk/SKILL.md');
+  const cx = wrapperFiles('codex').find((f) => f.path === '.agents/skills/fr-risk/SKILL.md');
   assert.ok(cx, 'codex $fr-risk skill exists');
 });
 
@@ -36,7 +36,7 @@ test('task is wrapped and forwards arguments (Task Contract from agents: /fr:tas
   assert.ok(cl, 'claude /fr:task wrapper exists');
   assert.match(cl!.content, /framein task \$ARGUMENTS/); // subcommand (show/amend …) passed via args
   assert.doesNotMatch(cl!.content, /--json/);            // task takes a subcommand → no leading --json
-  const cx = wrapperFiles('codex').find((f) => f.path === '.codex/skills/fr-task/SKILL.md');
+  const cx = wrapperFiles('codex').find((f) => f.path === '.agents/skills/fr-task/SKILL.md');
   assert.ok(cx, 'codex $fr-task skill exists');
   assert.match(cx!.content, /\$ARGUMENTS/);              // the skill forwards the user's arguments too
 });
@@ -44,7 +44,7 @@ test('task is wrapped and forwards arguments (Task Contract from agents: /fr:tas
 test('capsule and decide are wrapped (Task Capsule · Independent Challenge resolution from agents)', () => {
   for (const v of ['capsule', 'decide']) {
     assert.ok(wrapperFiles('claude').some((f) => f.path === `.claude/commands/fr/${v}.md`), `/fr:${v} exists`);
-    assert.ok(wrapperFiles('codex').some((f) => f.path === `.codex/skills/fr-${v}/SKILL.md`), `$fr-${v} exists`);
+    assert.ok(wrapperFiles('codex').some((f) => f.path === `.agents/skills/fr-${v}/SKILL.md`), `$fr-${v} exists`);
   }
 });
 

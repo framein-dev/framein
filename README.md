@@ -1,9 +1,31 @@
-# Framein
+<p align="center">
+  <img src="docs/assets/framein-readme-header.svg" alt="Framein" width="760">
+</p>
 
-**Keep one work frame across Claude, Codex, and Gemini.**
+<p align="center">
+  <strong>One local work frame beneath the coding agents you already use.</strong>
+</p>
 
-Start with one agent, challenge it with another, switch when needed, and close the work with
-validation.
+<p align="center">
+  Start with one agent. Challenge with another. Switch when needed. Ship with evidence.
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/framein"><img src="https://img.shields.io/npm/v/framein" alt="npm version"></a>
+  <img src="https://img.shields.io/badge/tests-249%20passing-brightgreen" alt="249 tests passing">
+  <img src="https://img.shields.io/badge/runtime-zero%20deps-blue" alt="zero runtime dependencies">
+  <img src="https://img.shields.io/badge/node-%3E%3D22.5-339933" alt="Node 22.5+">
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT license">
+</p>
+
+<p align="center">
+  <a href="https://www.framein.dev">Website</a> |
+  <a href="https://www.framein.dev/why">Developer note</a> |
+  <a href="docs/MANUAL.md">Manual</a> |
+  <a href="docs/INSTALL.md">Install guide</a> |
+  <a href="docs/FAQ.md">FAQ</a> |
+  <a href="SECURITY.md">Security</a>
+</p>
 
 Framein is a local work-state layer beneath the coding agents and harnesses you already use. Keep
 using Claude Code, Codex, Gemini, Pi, OpenCode, slash-command frameworks, skill packs, role-based
@@ -14,19 +36,12 @@ decision trail, risk state, validation results, and a compact capsule the next m
 start in Claude -> challenge with Codex -> switch when needed -> validate before ship
 ```
 
-Status: **public pre-release** (`v0.0.4`). Runtime dependencies: **zero**. Required Node:
+Status: **public pre-release** (`v0.0.5`). Runtime dependencies: **zero**. Required Node:
 **22.5.0+**.
 
 Links:
-- English: [Website](https://www.framein.dev) · [Developer note](https://www.framein.dev/why) · [Manual](docs/MANUAL.md) · [Install guide](docs/INSTALL.md) · [FAQ](docs/FAQ.md) · [Code signing policy](docs/CODE_SIGNING.md) · [Security](SECURITY.md)
+- English: [Website](https://www.framein.dev) · [Developer note](https://www.framein.dev/why) · [Manual](docs/MANUAL.md) · [Install guide](docs/INSTALL.md) · [FAQ](docs/FAQ.md) · [Security](SECURITY.md)
 - Korean: [웹사이트](https://www.framein.dev/ko) · [개발자 노트](https://www.framein.dev/ko/why) · [매뉴얼](docs/MANUAL.ko.md) · [설치 가이드](docs/INSTALL.ko.md)
-
-## Demo
-
-[![Framein demo: challenge and handoff across AI coding agents](docs/assets/framein-demo-storyboard.gif)](https://www.framein.dev/#demo)
-
-Challenge a plan with another model, then hand off the task without losing the local facts.
-[Watch the full 30-second demo](https://youtu.be/8dySQUOrrbk).
 
 ## Why Framein?
 
@@ -44,9 +59,6 @@ The pain Framein targets starts when the work has to survive beyond one model or
 Framein does not replace the coding agent or pretend to be a full multi-agent cockpit. It keeps one
 local work frame under the agents you already use.
 
-For the longer origin story and design notes, see
-[Why I built Framein](https://www.framein.dev/why).
-
 ## Quick Start
 
 npm is the supported cross-platform install path today:
@@ -59,8 +71,7 @@ framein --version
 Standalone executables are planned as an additional convenience path, mainly for users who do not
 want to install Node/npm or who want to avoid Windows npm shim and PowerShell execution-policy
 friction. They are not required to use Framein today. See
-[Install notes](docs/INSTALL.md#6-standalone-executables) and the
-[code signing policy](docs/CODE_SIGNING.md).
+[Install notes](docs/INSTALL.md#6-standalone-executables).
 
 If you want to test a local checkout instead:
 
@@ -93,8 +104,11 @@ framein capsule codex
 framein ship
 ```
 
-Use `challenge` when another model should review a claim or plan. Use `capsule <agent>` when a
-different model should continue from the same local facts. `verify` is a rehearsal; `ship` is the
+Use `challenge` when another model should review a claim or plan. In a live run, the reviewer returns
+a structured verdict, the lead gets one bounded response, and Framein prints a decision brief for the
+user to accept or reject. Use `capsule <agent>` when a different model should continue from the same
+local facts. After the current CLI exits, Framein launches the next agent with a short handoff prompt;
+the new agent still pulls facts with `framein capsule`. `verify` is a rehearsal; `ship` is the
 enforced gate and exits non-zero when hard validation fails.
 
 ## What You See
@@ -107,12 +121,15 @@ task contract
 
 $ framein challenge "OAuth callback stores state in session" --run
 reviewer  codex
-verdict   change required
+verdict   challenge
 required  add nonce/state validation
+lead      accepts required change
+next      framein decide accept "add nonce/state validation"
 
 $ framein capsule gemini
 next lead prepared from facts:
 contract · diff · tests · decisions
+exit the current agent; gemini opens and pulls the capsule first
 
 $ framein ship
 build ok · tests passed
@@ -129,7 +146,7 @@ so terminal commands, native agent wrappers, MCP tools, and the next model all r
 |---|---|---|
 | Define done | `framein start "<goal>"` | Creates a Task Contract: goal, acceptance, protected areas, non-goals |
 | Edit the contract | `framein task show` / `framein task amend ...` | Reviews or updates the definition of done |
-| Get second opinion | `framein challenge "<proposal>" --run` | Asks a different reviewer role for a bounded objection |
+| Get second opinion | `framein challenge "<proposal>" --run` | Asks a different reviewer role for a structured verdict, one lead response, and a decision brief |
 | Switch model/session | `framein capsule [agent]` | Prepares the next lead from contract, diff, validation, ADRs, and ledger |
 | Run validation | `framein verify` | Runs configured build/test checks and records the result |
 | Check risk | `framein risk` | Flags sensitive blast radius from changed files |
@@ -167,6 +184,9 @@ The generated agent commands expose the same agent-facing verbs across hosts:
 
 The wrappers do not contain product logic. They call the same local `framein` engine, so a command
 invoked from an agent, a terminal, or CI reads and writes the same contract, validation results, risk, and ledger.
+Agent-native `challenge` wrappers add `--run --by <host>` internally, so users call `/fr:challenge`
+or `$fr-challenge` without manually typing those flags. Codex repo skills are generated under
+`.agents/skills/fr-<verb>/SKILL.md`.
 
 Windows note: generated wrappers use `framein.cmd` to avoid PowerShell execution-policy failures from
 the npm `.ps1` shim inside agent shells.
@@ -220,7 +240,7 @@ Solid in the current pre-release:
 - MCP stdio server and registration helpers
 - Headless delegation to real CLIs where available
 - Windows author environment live-verified
-- `240+` automated tests passing
+- `249` automated tests passing as of 2026-06-28
 
 Still being validated:
 
@@ -254,7 +274,6 @@ Node **22.5.0+** is required because Framein uses built-in `node:sqlite`.
 - FAQ: [`docs/FAQ.md`](docs/FAQ.md)
 - Korean manual backup: [`docs/MANUAL.ko.md`](docs/MANUAL.ko.md)
 - Install troubleshooting: [`docs/INSTALL.md`](docs/INSTALL.md) / [`docs/INSTALL.ko.md`](docs/INSTALL.ko.md)
-- Code signing policy: [`docs/CODE_SIGNING.md`](docs/CODE_SIGNING.md)
 - Website: [framein.dev](https://www.framein.dev)
 
 ## License

@@ -14,6 +14,9 @@ import { DEFAULT_ROLE_PRIORITY } from './roles.js';
 // may live there. Verified: claude -p, codex exec, and gemini all read the prompt from stdin.
 export interface Invocation { command: string; args: string[]; stdin: string; }
 
+export const HANDOFF_START_PROMPT =
+  'Framein handoff: run `framein capsule` first, restate the current task contract briefly, then continue from the local facts. Do not ask the user to re-explain context.';
+
 /**
  * Non-interactive one-shot invocation for each agent (prompt via stdin, response on stdout).
  * `opts.trustFlags` (from trustPlan, F-TRUST) are FIXED per-agent permission-bypass flags appended
@@ -51,15 +54,21 @@ export function invocationCommand(inv: Invocation): string {
 // `resume` re-enters the agent's MOST RECENT session in this cwd (handoff continuity, F-CAPSULE/ADR-0009):
 // claude `--continue`, codex `resume --last`, gemini `--resume`. framein decides re-entry from its own
 // ledger (a prior enter/return for this agent) — it never scrapes the printed session id (ADR-0009).
-export function interactiveCommand(agent: Agent, resume = false, trustFlags: string[] = []): string {
+function shellQuote(arg: string): string {
+  if (process.platform === 'win32') return `"${arg.replace(/"/g, '\\"')}"`;
+  return `'${arg.replace(/'/g, `'\\''`)}'`;
+}
+
+export function interactiveCommand(agent: Agent, resume = false, trustFlags: string[] = [], initialPrompt?: string): string {
   // F-TRUST placement: codex `resume` is a SUBCOMMAND, so top-level bypass flags must come BEFORE it
   // (`codex --full-auto resume --last`); appending after the subcommand makes codex reject them. claude
   // `--continue` and gemini `--resume` are plain flags, so trust flags can follow.
   const t = trustFlags.length ? ` ${trustFlags.join(' ')}` : '';
+  const p = initialPrompt ? ` ${shellQuote(initialPrompt)}` : '';
   switch (agent) {
-    case 'claude': return `claude${resume ? ' --continue' : ''}${t}`;
-    case 'codex':  return `codex${t}${resume ? ' resume --last' : ''}`;
-    case 'gemini': return `gemini${resume ? ' --resume' : ''}${t}`;
+    case 'claude': return `claude${resume ? ' --continue' : ''}${t}${p}`;
+    case 'codex':  return `codex${t}${resume ? ' resume --last' : ''}${p}`;
+    case 'gemini': return `gemini${resume ? ' --resume' : ''}${t}${initialPrompt ? ` --prompt-interactive${p}` : ''}`;
     default: { const _exhaustive: never = agent; throw new Error(`unknown agent: ${String(_exhaustive)}`); }
   }
 }

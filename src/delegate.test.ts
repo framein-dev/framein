@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildInvocation, resolveAgent, renderInvocation, invocationCommand, interactiveCommand } from './delegate.js';
+import { HANDOFF_START_PROMPT, buildInvocation, resolveAgent, renderInvocation, invocationCommand, interactiveCommand } from './delegate.js';
 
 test('buildInvocation: fixed flags in args, prompt via stdin (injection-safe)', () => {
   assert.deepEqual(buildInvocation('claude', 'hi'), { command: 'claude', args: ['-p'], stdin: 'hi' });
@@ -38,6 +38,14 @@ test('interactiveCommand: trust flags placed where each CLI accepts them (codex 
   // claude/gemini use plain flags → trust flags can follow.
   assert.equal(interactiveCommand('claude', true, ['--dangerously-skip-permissions']), 'claude --continue --dangerously-skip-permissions');
   assert.equal(interactiveCommand('gemini', false, ['--yolo']), 'gemini --yolo');
+});
+
+test('interactiveCommand: handoff prompt is seeded only as an initial interactive prompt', () => {
+  const quoted = process.platform === 'win32' ? `"${HANDOFF_START_PROMPT}"` : `'${HANDOFF_START_PROMPT}'`;
+  assert.equal(interactiveCommand('claude', false, [], HANDOFF_START_PROMPT), `claude ${quoted}`);
+  assert.equal(interactiveCommand('codex', true, ['--full-auto'], HANDOFF_START_PROMPT), `codex --full-auto resume --last ${quoted}`);
+  assert.equal(interactiveCommand('gemini', false, [], HANDOFF_START_PROMPT), `gemini --prompt-interactive ${quoted}`);
+  assert.equal(interactiveCommand('gemini', true, [], HANDOFF_START_PROMPT), `gemini --resume --prompt-interactive ${quoted}`);
 });
 
 test('resolveAgent: assigned agent wins, else the role default', () => {

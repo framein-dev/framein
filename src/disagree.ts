@@ -8,12 +8,26 @@ import type { Agent } from './types.js';
 import { PLAIN, type Painter } from './ui/theme.js';
 
 export interface Proposal { text: string; by?: Agent; }
-export interface Challenge { verdict: 'challenge' | 'accept'; claim?: string; requiredChange?: string; by?: Agent; }
+export interface Challenge {
+  verdict: 'challenge' | 'accept';
+  claim?: string;
+  requiredChange?: string;
+  basis?: string[];
+  missingEvidence?: string[];
+  by?: Agent;
+}
+export interface LeadResponse {
+  text: string;
+  acceptsRequiredChange?: boolean;
+  proposedRevision?: string;
+  by?: Agent;
+}
 export interface Revision { text: string; accepted: boolean; by?: Agent; }
 
 export type DebateEntry =
   | { kind: 'proposal'; proposal: Proposal }
   | { kind: 'challenge'; challenge: Challenge }
+  | { kind: 'response'; response: LeadResponse }
   | { kind: 'revision'; revision: Revision };
 
 export interface Debate { topic: string; entries: DebateEntry[]; maxRounds: number; }
@@ -21,6 +35,7 @@ export interface Debate { topic: string; entries: DebateEntry[]; maxRounds: numb
 export type DebateStatus =
   | { state: 'awaiting-challenge' }
   | { state: 'awaiting-revision'; required?: string }
+  | { state: 'awaiting-decision'; required?: string }
   | { state: 'resolved'; how: 'accepted-by-reviewer' | 'lead-accepted' }
   | { state: 'escalate'; reason: string; options: string[] };
 
@@ -38,6 +53,7 @@ function leadPosition(d: Debate): string {
   for (let i = d.entries.length - 1; i >= 0; i--) {
     const e = d.entries[i];
     if (e.kind === 'revision') return e.revision.text || d.topic;
+    if (e.kind === 'response') return e.response.proposedRevision ?? e.response.text ?? d.topic;
     if (e.kind === 'proposal') return e.proposal.text;
   }
   return d.topic;
@@ -65,6 +81,10 @@ export function debateStatus(d: Debate): DebateStatus {
     if (rounds >= d.maxRounds) return escalate();
     return { state: 'awaiting-revision', required: last.challenge.requiredChange };
   }
+  if (last.kind === 'response') {
+    if (rounds >= d.maxRounds) return escalate();
+    return { state: 'awaiting-decision', required: reviewerRequirement(d) };
+  }
   // last is a revision
   if (last.revision.accepted) return { state: 'resolved', how: 'lead-accepted' };
   if (rounds >= d.maxRounds) return escalate();
@@ -80,6 +100,13 @@ export function renderDebate(d: Debate, ui: Painter = PLAIN): string {
       lines.push(c.verdict === 'accept'
         ? `challenge${c.by ? ` (${c.by})` : ''}: accept`
         : `challenge${c.by ? ` (${c.by})` : ''}: ${c.claim ?? ''}${c.requiredChange ? ` → require: ${c.requiredChange}` : ''}`);
+      if (c.basis?.length) lines.push(`  basis: ${c.basis.join(', ')}`);
+      if (c.missingEvidence?.length) lines.push(`  missing_evidence: ${c.missingEvidence.join('; ')}`);
+    } else if (e.kind === 'response') {
+      const r = e.response;
+      lines.push(`response${r.by ? ` (${r.by})` : ''}: ${r.text}`);
+      if (r.proposedRevision) lines.push(`  proposed_revision: ${r.proposedRevision}`);
+      if (r.acceptsRequiredChange !== undefined) lines.push(`  accepts_required_change: ${r.acceptsRequiredChange ? 'yes' : 'no'}`);
     } else {
       lines.push(`revision: ${e.revision.accepted ? 'accepted' : 'rejected'}${e.revision.text ? ` — ${e.revision.text}` : ''}`);
     }
@@ -88,6 +115,7 @@ export function renderDebate(d: Debate, ui: Painter = PLAIN): string {
   const st = debateStatus(d);
   if (st.state === 'resolved') lines.push(ui.tone(`Resolved (${st.how}).`, 'success'));
   else if (st.state === 'escalate') { lines.push(ui.tone(`Escalate to human — ${st.reason}:`, 'warning')); for (const o of st.options) lines.push(`  ${o}`); }
+  else if (st.state === 'awaiting-decision') lines.push(ui.tone(`Awaiting lead decision${st.required ? ` (reviewer requires: ${st.required})` : ''}.`, 'info'));
   else if (st.state === 'awaiting-revision') lines.push(ui.tone(`Awaiting lead revision${st.required ? ` (required: ${st.required})` : ''}.`, 'info'));
   else lines.push(ui.tone('Awaiting reviewer challenge.', 'info'));
   return lines.join('\n');

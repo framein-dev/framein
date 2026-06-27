@@ -4,7 +4,26 @@
 // handoff; Framein rebuilds the working context from validation results." Pure assembly; the CLI
 // gathers the inputs.
 import { detectThrash } from './anomaly.js';
+import { renderContractDigest } from './task.js';
 import { PLAIN } from './ui/theme.js';
+function inferNextAction(input, blocker) {
+    const contract = input.contract;
+    if (!contract?.goal.trim() && !input.goal?.trim())
+        return 'Start a task contract with `framein start "<goal>"`.';
+    if (input.openDebate)
+        return 'Resolve the open challenge with `framein decide accept|reject ...`.';
+    if (contract && contract.acceptance.length === 0)
+        return 'Add acceptance criteria with `framein task amend acceptance "<check>"`.';
+    if (blocker)
+        return 'Resolve the current blocker, then run `framein verify`.';
+    if (input.testSummary && input.testSummary.failed > 0)
+        return 'Fix failing validation, then run `framein verify`.';
+    if (input.handoffTarget)
+        return `Continue with ${input.handoffTarget}; run \`framein capsule\` first, then proceed from local facts.`;
+    if (input.changedFiles?.length)
+        return 'Run `framein verify`; if green, run `framein ship`.';
+    return 'Continue from the task contract; record evidence with `framein verify`.';
+}
 export function buildCapsule(input) {
     const ledger = input.ledger ?? [];
     const recentActivity = ledger.slice(-8).map((e) => `${e.kind}${e.target ? ' ' + e.target : ''}`);
@@ -17,7 +36,9 @@ export function buildCapsule(input) {
             blocker = fail.message;
     }
     return {
-        goal: input.goal ?? '(no task contract)',
+        goal: input.contract?.goal ?? input.goal ?? '(no task contract)',
+        contract: input.contract,
+        nextAction: inferNextAction(input, blocker),
         branch: input.branch,
         lastGreen: input.lastGreen,
         decisions: input.decisions ?? [],
@@ -33,6 +54,12 @@ const short = (sha) => sha.slice(0, 7);
 /** Readable capsule for `frame resume` / `frame capsule show`. Empty sections are omitted. */
 export function renderCapsule(c, ui = PLAIN) {
     const lines = [`task: ${c.goal}`];
+    if (c.contract) {
+        lines.push('contract:');
+        for (const line of renderContractDigest(c.contract).split('\n'))
+            lines.push(`  ${line.replace(/\*\*/g, '')}`);
+    }
+    lines.push(`next_action: ${c.nextAction}`);
     if (c.branch)
         lines.push(`branch: ${c.branch}`);
     if (c.lastGreen)

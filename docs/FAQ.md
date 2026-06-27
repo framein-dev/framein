@@ -35,6 +35,12 @@ stay with the project so switching harness, model, or session does not reset the
 
 If harnesses are the engine, Framein is the shared logbook the engines write to.
 
+## Is Framein a model router or API gateway?
+
+No. Framein is not a model router or API gateway. It does not intercept provider traffic, choose
+models per request, or relay tokens; it keeps repo-local work state beneath whichever agent or
+router setup you use.
+
 ## Is this just `CLAUDE.md`, `AGENTS.md`, or a skill pack?
 
 No. Those are useful inputs that help a model do better work, and Framein coexists with them. Keep
@@ -75,13 +81,18 @@ documented before release. Silent telemetry would violate the local-first design
 ## What does `challenge` do, and why not just switch models?
 
 `challenge` asks a different model for a bounded objection against the facts already recorded: the
-contract, diff, validation state, and relevant decisions. You do not need to open a fresh chat and
-re-explain the project.
+contract, capsule, diff, validation state, risk state, ledger, and relevant decisions. You do not need
+to open a fresh chat and re-explain the project.
+
+In a live run, Framein asks the reviewer for a structured JSON verdict (`verdict`, `claim`,
+`requiredChange`, `basis`, `missingEvidence`). If the reviewer challenges, Framein asks the lead for
+one bounded response and prints a decision brief. The user still decides with `framein decide`; the
+reviewer never edits code or takes control from the lead.
 
 The point is not always to replace the stuck model. Sometimes you need a second set of eyes while the
 work is still alive. On something like a checkout webhook where retries and idempotency matter, a
-confident "done" can still be unsafe. One bounded "what risk is this plan missing?" can be more
-useful than a full model swap.
+confident "done" can still be unsafe. One bounded "what risk is this plan missing?" plus one lead
+response can be more useful than a full model swap.
 
 ## Does this lock me into Claude, Codex, and Gemini?
 
@@ -108,7 +119,7 @@ What you can inspect today:
 - MIT-licensed source;
 - zero runtime dependencies;
 - Node 22's built-in `node:sqlite` for the local store;
-- 240+ automated tests;
+- 249 automated tests passing as of 2026-06-28;
 - all work-frame state stored in files you can read in your repo;
 - `ship` exits non-zero on hard validation failure;
 - deployment remains a human gate.

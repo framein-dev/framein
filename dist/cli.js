@@ -8,14 +8,15 @@ import { Store } from './store.js';
 import { writeNativeFiles, planNativeFiles } from './fileWriter.js';
 import { ROLES, AGENTS } from './types.js';
 import { isAgent, isRole, selectAgent, DEFAULT_ROLE_PRIORITY } from './roles.js';
-import { buildInvocation, resolveAgent, renderInvocation, invocationCommand, interactiveCommand } from './delegate.js';
+import { HANDOFF_START_PROMPT, buildInvocation, resolveAgent, renderInvocation, invocationCommand, interactiveCommand } from './delegate.js';
 import { detectQuotaSignal } from './quota.js';
 import { trustPlan, parseDuration, DEFAULT_TRUST_TTL_SEC } from './trust.js';
 import { emptyContract, amendContract, contractIssues, renderContractFull, buildGuidedContract, GUIDED_CONTRACT_STEPS } from './task.js';
 import { gate, renderGate, renderShip, parseTestSummary } from './evidence.js';
 import { buildRescue, renderRescue } from './rescue.js';
 import { buildCapsule, renderCapsule } from './capsule.js';
-import { newDebate, renderDebate } from './disagree.js';
+import { debateStatus, newDebate, renderDebate } from './disagree.js';
+import { buildLeadResponsePrompt, buildReviewerPrompt, challengeFromVerdict, normalizeLeadModelResponse, normalizeReviewerVerdict, renderDecisionBrief, responseFromLeadModel, } from './challenge.js';
 import { extractJson } from './ingest.js';
 import { assessBlastRadius, renderBlast, riskTransition } from './blast.js';
 import { computeRepoStats, explainRoute, renderRouteExplain, renderStats } from './stats.js';
@@ -660,7 +661,7 @@ const USAGE = {
     pause: 'framein pause — save an auto-generated Task Capsule (resume state) from the store + git',
     resume: 'framein resume — print the saved capsule (or rebuild one) to continue without a manual handoff',
     capsule: 'framein capsule show — render the current Task Capsule',
-    challenge: 'framein challenge "<proposal>" [--run] | --block "<claim>" [--require "<change>"] | --accept | --show — bounded reviewer debate; --run asks the reviewer for a structured verdict',
+    challenge: 'framein challenge "<proposal>" [--run] | --block "<claim>" [--require "<change>"] | --accept | --show — bounded reviewer debate; --run asks for a reviewer verdict, one lead response, and a decision brief',
     decide: 'framein decide accept|reject [text] — the lead resolves the open debate',
     debt: 'framein debt — Vibe Debt Delta: what THIS change added (deps/TODOs/lines), not the whole codebase',
     explain: 'framein explain [--run] — Ownership Brief skeleton (changed/test/rollback filled); --run has the explainer agent complete the narrative',
@@ -956,9 +957,12 @@ function gatherCapsule(store) {
     const ev = store.getMemory('evidence', 'last');
     const del = store.getMemory('delegation', 'last');
     const handoff = store.getMemory('handoff', 'next');
+    const debate = store.getMemory('debate', 'current');
+    const openDebate = debate ? debateStatus(debate).state !== 'resolved' : false;
     const changed = gitChangedFiles();
     return buildCapsule({
         goal: contract?.goal,
+        contract,
         decisions,
         branch: gitBranch(),
         lastGreen: cp?.sha,
@@ -967,6 +971,7 @@ function gatherCapsule(store) {
         ledger: store.listLedger(),
         lastDelegation: del ? { agent: del.agent, ok: del.ok } : undefined,
         handoffTarget: handoff && isAgent(handoff) ? handoff : undefined,
+        openDebate,
     });
 }
 function cmdPause() {
@@ -1014,6 +1019,11 @@ function cliInstalled(c) {
     const r = spawnSync(c, ['--version'], { encoding: 'utf8', shell: true });
     return r.status === 0 && !r.error;
 }
+function legacyWrapperPaths(host) {
+    if (host !== 'codex')
+        return [];
+    return WRAP_VERBS.map((v) => `.codex/skills/fr-${v.verb}/SKILL.md`);
+}
 function cmdIntegrations(args) {
     const sub = args[0] ?? 'list';
     if (sub === 'list') {
@@ -1021,7 +1031,7 @@ function cmdIntegrations(args) {
         for (const h of WRAP_HOSTS) {
             const present = wrapperFiles(h).filter((f) => existsSync(f.path)).length;
             const pattern = h === 'codex'
-                ? '.codex/skills/fr-<verb>/SKILL.md'
+                ? '.agents/skills/fr-<verb>/SKILL.md'
                 : wrapperFiles(h)[0].path.replace(/[^/]+$/, '*');
             console.log(`  ${h.padEnd(7)} ${pattern}  (${present}/${WRAP_VERBS.length} installed)`);
         }
@@ -1066,6 +1076,14 @@ function cmdIntegrations(args) {
                     n++;
                 }
             }
+        for (const h of hosts)
+            for (const p of legacyWrapperPaths(h)) {
+                if (existsSync(p) && readFileSync(p, 'utf8').includes(PROVENANCE)) {
+                    rmSync(p);
+                    console.log(`removed legacy ${p}`);
+                    n++;
+                }
+            }
         console.log(`Removed ${n} framein wrapper(s).`);
         return;
     }
@@ -1079,7 +1097,7 @@ function cmdDoctor() {
         const present = wrapperFiles(h).filter((f) => existsSync(f.path)).length;
         console.log(`  wrappers ${h.padEnd(7)} ${present}/${WRAP_VERBS.length}  (framein integrations install ${h} --write)`);
     }
-    console.log('  note: Codex wrappers are skills in .codex/skills/fr-<verb>/ — invoke them with `$fr-verify` (Codex `/prompts` is deprecated).');
+    console.log('  note: Codex wrappers are repo skills in .agents/skills/fr-<verb>/; invoke them with `$fr-verify`.');
     console.log("  note: bare-name clashes are avoided by the 'fr' namespace (/fr:verify, $fr-verify).");
 }
 function cmdSetup() {
@@ -1100,7 +1118,7 @@ function agentAvailable(agent) {
     const r = spawnSync(interactiveCommand(agent), ['--version'], { encoding: 'utf8', shell: true });
     return r.status === 0 && !r.error;
 }
-function launchLeadTui(state, agent, interactive, prompt, caps, pause, resume) {
+function launchLeadTui(state, agent, interactive, prompt, caps, pause, resume, initialPrompt) {
     const ui = painter(caps);
     state.lead = agent;
     if (prompt)
@@ -1150,6 +1168,8 @@ function launchLeadTui(state, agent, interactive, prompt, caps, pause, resume) {
     }
     const trusted = !!state.trustUntil && state.trustUntil > Date.now();
     const trustFlags = trusted ? trustPlan(agent).flags : [];
+    if (initialPrompt)
+        console.log(ui.tone(`  handoff prompt seeded; ${agent} should pull the capsule first.`, 'muted'));
     console.log(ui.tone(`→ handing the terminal to ${agent} — framein is paused.`, 'brand'));
     if (resumeSession)
         console.log(ui.tone(`  ↻ resuming your previous ${agent} session (continuity).`, 'muted'));
@@ -1158,7 +1178,7 @@ function launchLeadTui(state, agent, interactive, prompt, caps, pause, resume) {
     console.log(ui.tone(`  to come back to the lobby, exit ${agent} (Ctrl-D). ('/go' is a lobby command — it won't return you.)`, 'muted'));
     pause();
     // trustFlags are placed per-agent by interactiveCommand (codex needs them BEFORE its `resume` subcommand).
-    const res = spawnSync(interactiveCommand(agent, resumeSession, trustFlags), { stdio: 'inherit', shell: true });
+    const res = spawnSync(interactiveCommand(agent, resumeSession, trustFlags, initialPrompt), { stdio: 'inherit', shell: true });
     resume();
     if (res.error)
         console.error(ui.tone(`Could not launch ${agent}: ${res.error.message}`, 'danger'));
@@ -1186,7 +1206,7 @@ function launchLeadTui(state, agent, interactive, prompt, caps, pause, resume) {
     if (nextLead) {
         console.log(ui.tone(`↪ handoff: switching to ${nextLead} (carrying the capsule)…`, 'brand'));
         state.lead = nextLead;
-        launchLeadTui(state, nextLead, interactive, undefined, caps, pause, resume); // chain; the new lead pulls the capsule
+        launchLeadTui(state, nextLead, interactive, undefined, caps, pause, resume, HANDOFF_START_PROMPT); // chain; the new lead pulls the capsule
     }
 }
 /** The live status block shown on shell entry (style guide §8.1/§18): who leads, the contract, sync. */
@@ -1525,7 +1545,7 @@ function cmdShell() {
         // below it and ERASES itself on choice (clearOnExit), so what remains is a single lobby screen —
         // not a stacked [pick]+[welcome] two-stage view.
         if (interactive) {
-            const ver = readVersion().replace(/^framein /, 'v'); // e.g. v0.0.4
+            const ver = readVersion().replace(/^framein /, 'v'); // e.g. v0.0.5
             console.log(renderFrame('FRAMEIN', [`Framein by Frameout · ${ver}`, 'Intent in · Validation in · Drift out'], { ui, unicode: caps.unicode, columns: caps.columns }));
             console.log('');
         }
@@ -1808,7 +1828,15 @@ function cmdChallenge(args) {
             }
             if (by && reviewer === by)
                 console.log(`(reviewer role is ${by} = the calling model — using ${indep} instead so the verdict is genuinely independent.)`);
-            runReviewerChallenge(store, d, indep, text);
+            const facts = gatherChallengeFacts(store, text, d);
+            const verdict = runReviewerChallenge(store, d, indep, facts);
+            if (!verdict)
+                return;
+            const lead = proposer && isAgent(proposer) ? proposer : undefined;
+            const leadResponse = verdict.verdict === 'challenge' && lead && lead !== indep
+                ? runLeadChallengeResponse(store, d, lead, facts, verdict)
+                : undefined;
+            console.log('\n' + renderDecisionBrief({ proposal: text, reviewer: indep, lead, verdict, leadResponse }));
             return;
         }
         const hint = independentReviewer(store, by);
@@ -1816,11 +1844,23 @@ function cmdChallenge(args) {
             console.log(`\n(get an independent verdict from ${hint} with --run, or record one with --block/--accept)`);
     });
 }
+function gatherChallengeFacts(store, proposal, debate) {
+    const changed = gitChangedFiles();
+    return {
+        proposal,
+        contract: store.getTaskContract(),
+        capsule: gatherCapsule(store),
+        evidence: store.getMemory('evidence', 'last'),
+        risk: assessBlastRadius(changed),
+        ledger: store.listLedger(40),
+        debate,
+    };
+}
 /** A reviewer that is NOT the calling model (`by`) so an "independent challenge" is actually independent:
  *  the configured reviewer if it differs, else the first OTHER installed agent. undefined if none differ. */
 function independentReviewer(store, by) {
     const configured = store.getRole('reviewer');
-    if (configured && configured !== by)
+    if (configured && configured !== by && agentAvailable(configured))
         return configured;
     return AGENTS.find((a) => a !== by && agentAvailable(a));
 }
@@ -1829,29 +1869,49 @@ function independentReviewer(store, by) {
  * tolerantly, and record it as a Challenge in the debate. The prompt (fixed instruction + the
  * proposal) goes via stdin — injection-safe. Needs the real reviewer CLI.
  */
-function runReviewerChallenge(store, d, reviewer, proposal) {
-    const reviewPrompt = `You are the reviewer in a design debate. Decide whether to CHALLENGE or ACCEPT the proposal below. Reply with ONLY a JSON object, no prose: {"verdict":"challenge"|"accept","claim":"<one-line blocking claim, or empty>","requiredChange":"<the change you require, or empty>"}\n\nProposal:\n${proposal}`;
-    const inv = buildInvocation(reviewer, reviewPrompt);
-    console.log(`\nAsking reviewer ${reviewer} for a structured verdict…`);
+function runReviewerChallenge(store, d, reviewer, facts) {
+    const inv = buildInvocation(reviewer, buildReviewerPrompt(facts));
+    console.log(`\nAsking reviewer ${reviewer} for a structured verdict...`);
     const res = spawnSync(invocationCommand(inv), { input: inv.stdin, encoding: 'utf8', shell: true });
-    const parsed = extractJson(res.stdout ?? '');
-    const verdict = parsed?.verdict;
-    if (parsed && (verdict === 'challenge' || verdict === 'accept')) {
-        const claim = parsed.claim ? String(parsed.claim) : undefined;
-        const requiredChange = parsed.requiredChange ? String(parsed.requiredChange) : undefined;
-        d.entries.push({ kind: 'challenge', challenge: { verdict, claim, requiredChange, by: reviewer } });
-        store.setMemory('debate', 'current', d);
-        store.appendLedger('challenge', reviewer, String(verdict));
-        console.log(`(reviewer ${reviewer} responded)\n`);
-        console.log(renderDebate(d, cliUi()));
-    }
-    else {
-        console.log(`(reviewer ${reviewer} did not return a parseable verdict — record manually with --block/--accept; raw output:)`);
+    const parsed = normalizeReviewerVerdict(extractJson(res.stdout ?? ''));
+    if (!parsed) {
+        console.log(`(reviewer ${reviewer} did not return a parseable verdict; record manually with --block/--accept; raw output:)`);
         if (res.stdout)
             process.stdout.write(res.stdout);
         if (res.stderr)
             process.stderr.write(res.stderr);
+        return undefined;
     }
+    d.entries.push({ kind: 'challenge', challenge: challengeFromVerdict(parsed, reviewer) });
+    store.setMemory('debate', 'current', d);
+    store.appendLedger('challenge', reviewer, parsed.verdict);
+    console.log(`(reviewer ${reviewer} responded)\n`);
+    console.log(renderDebate(d, cliUi()));
+    return parsed;
+}
+function runLeadChallengeResponse(store, d, lead, facts, verdict) {
+    if (!agentAvailable(lead)) {
+        console.log(`(lead ${lead} is not available for a live response; decide manually.)`);
+        return undefined;
+    }
+    const inv = buildInvocation(lead, buildLeadResponsePrompt(facts, verdict));
+    console.log(`\nAsking lead ${lead} for one bounded response...`);
+    const res = spawnSync(invocationCommand(inv), { input: inv.stdin, encoding: 'utf8', shell: true });
+    const parsed = normalizeLeadModelResponse(extractJson(res.stdout ?? ''));
+    if (!parsed) {
+        console.log(`(lead ${lead} did not return a parseable response; decide manually; raw output:)`);
+        if (res.stdout)
+            process.stdout.write(res.stdout);
+        if (res.stderr)
+            process.stderr.write(res.stderr);
+        return undefined;
+    }
+    d.entries.push({ kind: 'response', response: responseFromLeadModel(parsed, lead) });
+    store.setMemory('debate', 'current', d);
+    store.appendLedger('challenge-response', lead, parsed.text.slice(0, 80));
+    console.log(`(lead ${lead} responded)\n`);
+    console.log(renderDebate(d, cliUi()));
+    return parsed;
 }
 function cmdDecide(args) {
     withStore((store) => {
@@ -1900,7 +1960,7 @@ const HELP_ROWS = [
     ['rescue', 'detect a repair loop + propose options (no auto-action)'],
     ['checkpoint [label]', 'mark the current commit green · also: rewind [--force]'],
     ['pause | resume', 'save / restore a Task Capsule (handoff-free continuity)'],
-    ['challenge | decide', 'bounded reviewer debate (max 2 rounds, then escalate)'],
+    ['challenge | decide', 'reviewer verdict + one lead response, then decide'],
     ['init', 'initialize store + project native files'],
     ['rules show|set|reset', 'view / set the project rules the agent follows (editable defaults)'],
     ['status', 'show roles, lock, decision count'],

@@ -4,8 +4,6 @@ Framein is a public pre-release. The supported cross-platform install path is np
 
 Korean guide: [INSTALL.ko.md](INSTALL.ko.md)
 
-Code signing policy: [CODE_SIGNING.md](CODE_SIGNING.md)
-
 ## 0. Requirements
 
 - **Node.js 22.5.0 or newer.** Framein uses the built-in experimental `node:sqlite` module.
@@ -31,7 +29,7 @@ framein --version
 Expected result:
 
 ```text
-framein 0.0.4
+framein 0.0.5
 ```
 
 To remove the global install:
@@ -153,7 +151,7 @@ The planned executable form bundles the Node runtime with Framein's code. It doe
 globally or modify the user's system Node installation.
 
 There is no official standalone `.exe`, `.pkg`, `.dmg`, Linux binary package, `winget`, `scoop`, or
-Chocolatey install path for `v0.0.4`. Do not treat self-built, unsigned, or test-signed binaries as
+Chocolatey install path for `v0.0.5`. Do not treat self-built, unsigned, or test-signed binaries as
 official releases. The expected future Windows path is a GitHub Release asset such as
 `framein-win-x64.exe`, accompanied by `SHA256SUMS.txt`, signature verification instructions, and
 clear signed/unsigned release notes.

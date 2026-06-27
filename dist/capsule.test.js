@@ -1,10 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildCapsule, renderCapsule } from './capsule.js';
+import { amendContract, emptyContract } from './task.js';
 const led = (kind, target = '') => ({ id: 0, ts: '', kind, target, detail: '' });
 test('buildCapsule: carries goal, decisions, validation results, compressed recent activity', () => {
+    const contract = amendContract(emptyContract('add Google login'), 'acceptance', 'auth tests pass');
     const c = buildCapsule({
-        goal: 'add Google login',
+        contract,
         decisions: [{ id: 12, title: 'keep session cookie' }],
         branch: 'feat/google-auth',
         lastGreen: '8f2c1abdead',
@@ -15,8 +17,28 @@ test('buildCapsule: carries goal, decisions, validation results, compressed rece
     assert.equal(c.goal, 'add Google login');
     assert.deepEqual(c.decisions, [{ id: 12, title: 'keep session cookie' }]);
     assert.deepEqual(c.evidence, { passed: 41, failed: 1 });
+    assert.equal(c.contract?.goal, 'add Google login');
+    assert.match(c.nextAction, /failing validation/i);
     assert.ok(c.recentActivity.length <= 8);
     assert.ok(c.recentActivity.some((a) => /edit a\.ts/.test(a)));
+});
+test('buildCapsule: next action points to open challenge resolution before validation', () => {
+    const contract = amendContract(emptyContract('fix webhook retries'), 'acceptance', 'retry tests pass');
+    const c = buildCapsule({
+        contract,
+        openDebate: true,
+        changedFiles: ['src/webhook.ts'],
+        testSummary: { passed: 8, failed: 1 },
+    });
+    assert.match(c.nextAction, /Resolve the open challenge/);
+});
+test('renderCapsule: includes contract digest and next action', () => {
+    const contract = amendContract(emptyContract('ship docs'), 'acceptance', 'README links work');
+    const out = renderCapsule(buildCapsule({ contract, changedFiles: ['README.md'] }));
+    assert.match(out, /contract:/);
+    assert.match(out, /Goal: ship docs/);
+    assert.match(out, /Acceptance: README links work/);
+    assert.match(out, /next_action: Run `framein verify`/);
 });
 test('buildCapsule: surfaces the last delegation result (ingest from a live run)', () => {
     const c = buildCapsule({ goal: 'g', lastDelegation: { agent: 'claude', ok: true } });

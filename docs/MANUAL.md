@@ -5,7 +5,7 @@
 > tools. You do not need to learn a new prompt window. Automation-facing commands also support
 > `--json` where the command has a stable structured output.
 
-> **Default usage = agent-driven workflow.** `framein init` projects operating guidance
+> **Default usage = agent-driven workflow (ADR-0012/0016).** `framein init` projects operating guidance
 > into native context files. In normal use, the agent can create the task contract near the start of
 > work, call another model for a bounded challenge, prepare a model switch when needed, and run
 > validation before it calls the task done. Long-form `framein <verb>` commands are the fallback and
@@ -18,6 +18,7 @@
 > frameworks, skill packs, role workflows, or your own agent setup. Framein adds the missing work
 > frame underneath: a task contract, decision trail, bounded challenge loop, model-switch capsule,
 > deterministic build/test validation, and blast-radius checks.
+> See [ADR-0016](./adr/0016-work-frame-across-agents-positioning.md).
 
 This is the default English manual. The Korean original is preserved at
 [`docs/MANUAL.ko.md`](./MANUAL.ko.md).
@@ -81,18 +82,18 @@ object, risk rises, and validation closes the task.
 
 ## 2. Design Philosophy
 
-These principles define the public behavior Framein tries to preserve.
+Each principle is backed by an ADR under [`docs/adr/`](./adr/).
 
-| Principle | Meaning |
-|---|---|
-| **Control layer, not executor** | Framein does not drive or scrape the terminal. It observes through the shared store and ledger. |
-| **In-place by default** | Keep typing into the native CLI. Other roles are called into the current workflow rather than forcing a new prompt surface. |
-| **No relay** | Framein does not collect subscription credentials or route requests through a central account. Each CLI keeps its own official auth. |
-| **Audit cadence** | Do not review every turn. Call another model at gates or anomaly points only. |
-| **Fresh on read** | Sharing is pull-based. The promise is "latest facts are always readable", not automatic push. |
-| **Append-only decisions** | Decisions are not updated or deleted. Corrections use `supersede`. |
-| **Zero runtime dependencies** | Runtime code uses Node built-ins only, including `node:sqlite`. |
-| **Reuse first** | Existing MCP servers and skills are detected, recommended, or registered. They are not proxied or reimplemented. |
+| Principle | Meaning | Source |
+|---|---|---|
+| **Control layer, not executor** | Framein does not drive or scrape the terminal. It observes through the shared store and ledger. | ADR-0008 |
+| **In-place by default** | Keep typing into the native CLI. Other roles are called into the current workflow rather than forcing a new prompt surface. | ADR-0006 |
+| **No relay** | Framein does not collect subscription credentials or route requests through a central account. Each CLI keeps its own official auth. | PRD section 2.3 |
+| **Audit cadence** | Do not review every turn. Call another model at gates or anomaly points only. | ADR-0005 |
+| **Fresh on read** | Sharing is pull-based. The promise is "latest facts are always readable", not automatic push. | PRD section 4.2 |
+| **Append-only ADRs** | Decisions are not updated or deleted. Corrections use `supersede`. | ADR-0001 and later |
+| **Zero runtime dependencies** | Runtime code uses Node built-ins only, including `node:sqlite`. | ADR-0003 |
+| **Reuse first** | Existing MCP servers and skills are detected, recommended, or registered. They are not proxied or reimplemented. | ADR-0002/0004 |
 
 ---
 
@@ -130,7 +131,7 @@ Lead agent works normally.
 
 framein challenge
   Ask a different model for a bounded objection when another view is useful.
-  The reviewer returns claims; the lead decides.
+  Live runs collect a reviewer verdict, one lead response, and a decision brief.
 
 framein capsule <agent>
   Prepare a model switch from local facts.
@@ -228,8 +229,10 @@ framein checkpoint baseline
 # 3) When another model should review the plan or diff, ask for a bounded challenge.
 framein challenge "review the OAuth callback plan" --run
 # reviewer: codex
-# verdict: change required
-# required: add nonce/state validation
+# verdict: challenge
+# required_change: add nonce/state validation
+# lead_response: accept the required change
+# next: framein decide accept "add nonce/state validation"
 
 # 4) When a different model should continue, prepare a model switch from local facts.
 framein capsule codex
@@ -271,7 +274,7 @@ These are the verbs users should remember first. Engine and administrative comma
 |---|---|---|
 | `framein start <goal>` | Fix intent as a Task Contract | Alias of `task start`; add acceptance and non-goals with `framein task amend`. |
 | `framein ask <role> [prompt]` | Call in another role | Supports `--show`, `--run`, `--interactive`, and `--trust`. |
-| `framein challenge "<proposal>"` | Ask for bounded disagreement | A different model reviews the proposal; unresolved debate escalates after two rounds. |
+| `framein challenge "<proposal>"` | Ask for bounded disagreement | A different model reviews the proposal, the lead gets one response, and unresolved debate escalates after two rounds. |
 | `framein capsule [agent]` | Prepare a model switch | Builds a compact view of contract, diff, validation, ADRs, and ledger for the next lead. |
 | `framein verify` | Rehearse validation | Runs build/test checks and compares the result with the contract. |
 | `framein rescue` | Detect and recover from repair loops | Suggests options. It does not automatically act. |
@@ -317,7 +320,7 @@ framein ship       # enforced gate: readiness, commit/deploy guidance, non-zero 
   the result.
 - `framein ship` adds the Blast Radius result when changed files touch sensitive areas.
 
-Older internal names may refer to this as the "Evidence Gate". Public-facing copy now uses
+Older internal ADRs and code may refer to this as the "Evidence Gate". Public-facing copy now uses
 "Validation Gate" to make the developer intent clearer.
 
 ### 7.3 Rescue Mode: Stop Repair Loops (`rescue`, `checkpoint`, `rewind`)
@@ -350,15 +353,23 @@ framein capsule codex  # prepare a lead-model switch; capsule show includes the 
 
 - The `blocker` field is derived from repeated-failure signals in the ledger.
 - A capsule is designed for model/session switches, not just human summaries.
+- `capsule <agent>` arms a one-shot lead switch. When the current native CLI exits, the lobby
+  launches the target agent and seeds a short handoff prompt that tells it to run `framein capsule`
+  first. Framein does not push the capsule body; the next model pulls fresh local facts.
+- Gemini interactive handoff requires Gemini CLI auth to be configured for API-key mode and
+  `GEMINI_API_KEY` to be available to the launched process.
 
 ### 7.5 Disagreement Protocol: Bound Model Debate (`challenge`, `decide`)
 
-Framein limits model disagreement to a small protocol: proposal, objection, resolution. The reviewer
-does not edit the code. It returns claims, reasons, and requirements. The lead keeps control.
+Framein limits model disagreement to a small protocol: proposal, reviewer verdict, one lead response,
+and resolution. The reviewer does not edit the code. It returns a structured JSON verdict:
+`verdict`, `claim`, `requiredChange`, `basis`, and `missingEvidence`. If the verdict is a challenge,
+Framein asks the lead for one bounded response, prints a decision brief, and then the user records the
+choice with `framein decide`.
 
 ```bash
 framein challenge "<proposal>"                         # start a debate from the lead proposal
-framein challenge "<proposal>" --run                   # ask an independent reviewer model
+framein challenge "<proposal>" --run                   # ask an independent reviewer model + one lead response
 framein challenge --block "<claim>" --require "<need>" # record reviewer objection manually
 framein challenge --accept                             # reviewer accepts; debate resolved
 framein decide accept|reject ["<reason or revision>"]  # lead resolves
@@ -367,7 +378,9 @@ framein challenge --show                               # print current debate st
 
 - After two unresolved rounds, Framein escalates to exactly two human choices: the lead position or
   the reviewer requirement.
-- Generated wrappers add `--by <host>` for `challenge`, so the calling agent does not review itself.
+- Generated wrappers add `--run --by <host>` for `challenge`, so agent-native `/fr:challenge` or
+  `$fr-challenge` runs the live review without the user typing flags, and the calling agent does not
+  review itself.
 
 ### 7.6 Blast Radius Guard: Raise the Gate Only When Risk Changes (`risk`)
 
@@ -555,7 +568,7 @@ framein integrations uninstall claude     # removes only Framein-provenance file
 |---|---|---|
 | Claude | `.claude/commands/fr/<verb>.md` | `/fr:verify` with `allowed-tools: Bash(framein:*)` |
 | Gemini | `.gemini/commands/fr/<verb>.toml` | `/fr:verify` with `!{framein verify --json}` |
-| Codex | `.codex/skills/fr-<verb>/SKILL.md` | `$fr-verify`; Codex `/prompts` is deprecated |
+| Codex | `.agents/skills/fr-<verb>/SKILL.md` | `$fr-verify`; Codex repo skill |
 
 Generated agent-facing verbs:
 
@@ -575,9 +588,10 @@ Generated agent-facing verbs:
 Notes:
 
 - Most wrappers call `framein <verb> --json` when the verb has stable JSON output.
-- `start`, `challenge`, `task`, `capsule`, and `decide` forward arguments in their natural CLI form.
+- `start`, `task`, `capsule`, and `decide` forward arguments in their natural CLI form.
 - `challenge` wrappers add `--run --by <host>` so Framein selects an independent reviewer rather
-  than asking the calling agent to review itself.
+  than asking the calling agent to review itself. Use `/fr:challenge "..."` or `$fr-challenge "..."`
+  without manually typing `--run`.
 - Windows wrappers call `framein.cmd` to avoid PowerShell execution-policy failures from npm's
   `.ps1` shim. Regenerate old wrappers with `framein integrations install all --write`.
 - `install` previews unless you pass `--write`. `uninstall` is intentionally an apply command, but it
@@ -758,7 +772,7 @@ Solid in the current pre-release:
 - Live CLI verification: headless delegation, MCP connection and tool calls, `trust`, interactive
   attach through `stdio:inherit`, structured model-ingest paths, and quota failover.
 - Windows author environment verified.
-- `240+` automated tests passing.
+- `249` automated tests passing as of 2026-06-28.
 
 Still being validated:
 
@@ -888,10 +902,10 @@ Code conventions:
 
 - ESM + `NodeNext`.
 - In TypeScript source, import local modules with explicit `.js` extensions.
-- Read [`README.md`](../README.md) and this manual before changing behavior with product-level
-  tradeoffs.
+- Read root [`CLAUDE.md`](../CLAUDE.md) for repo guidance, [`PRD.md`](./PRD.md) for product context,
+  and [`docs/adr/`](./adr/) for decisions.
 
 ---
 
-**Framein by Frameout**. MIT. See [`LICENSE`](../LICENSE), [`SECURITY.md`](../SECURITY.md), and
-[`CONTRIBUTING.md`](../CONTRIBUTING.md).
+**Framein by Frameout**. MIT. See [`LICENSE`](../LICENSE), [`STATUS.md`](../STATUS.md),
+[`SECURITY.md`](../SECURITY.md), and [`FRAMEIN-DESIGN-STYLE-GUIDE.md`](./FRAMEIN-DESIGN-STYLE-GUIDE.md).
