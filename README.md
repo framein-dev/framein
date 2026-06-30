@@ -277,6 +277,12 @@ Node **22.5.0+** is required because Framein uses built-in `node:sqlite`.
 - Install troubleshooting: [`docs/INSTALL.md`](docs/INSTALL.md) / [`docs/INSTALL.ko.md`](docs/INSTALL.ko.md)
 - Website: [framein.dev](https://www.framein.dev)
 
+## Community & feedback
+
+Questions, setup trouble, or ideas? Open a thread in [GitHub Discussions](https://github.com/framein-dev/framein/discussions).
+
+This is a public pre-release — honest feedback, including "I tried it and bounced because X," is the most useful thing you can share.
+
 ## License
 
 MIT. Framein by [Frameout](https://frameout.co.kr).
